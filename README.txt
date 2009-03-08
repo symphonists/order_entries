@@ -2,7 +2,7 @@
 Order Entries field
 ------------------------------------
 
-Version: 1.0
+Version: 1.1
 Author: Nick Dunn (nick.dunn@airlock.com)
 Build Date: 2009-03-02
 Requirements: Symphony 2.0.1
@@ -25,6 +25,10 @@ Requirements: Symphony 2.0.1
 3. When ordered ascending, drag entries within the table and the orders will be resaved.
 
 [CHANGES]
+
+1.1
+- Table prefixes no longer hard coded as 'sym_'
+- Check for Publish index page uses Symphony methods rather than splitting the querystring
 
 1.0
 - Fixed bug with changing login methods in 2.0.1 (thanks go to michael-s)
