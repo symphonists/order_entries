@@ -2,9 +2,9 @@
 Order Entries field
 ------------------------------------
 
-Version: 1.1
+Version: 1.2
 Author: Nick Dunn (nick.dunn@airlock.com)
-Build Date: 2009-03-02
+Build Date: 2009-03-08
 Requirements: Symphony 2.0.1
 
 	
@@ -25,6 +25,10 @@ Requirements: Symphony 2.0.1
 3. When ordered ascending, drag entries within the table and the orders will be resaved.
 
 [CHANGES]
+
+1.2
+- Save page now uses native Symphony content pages (improves compatibility with future Symphony releases)
+- Improved the way path to the save page is evaluated
 
 1.1
 - Table prefixes no longer hard coded as 'sym_'
