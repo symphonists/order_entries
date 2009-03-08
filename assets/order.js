@@ -11,7 +11,9 @@ DOM.onready(function() {
 		return false;
 	}
 	
-	var save = new Request("../../../extensions/order_entries/assets/save.php", function(request) {
+	var href = DOM.select("h1 a")[0].getAttribute("href");
+	if (href.substr(href.length - 1, href.length) != "/") href += "/";
+	var save = new Request(href + "symphony/extension/order_entries/save/", function(request) {
 		DOM.removeClass("busy", table);
 	});
 	
