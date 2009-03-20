@@ -26,6 +26,9 @@ Requirements: Symphony 2.0.1
 
 [CHANGES]
 
+1.3
+- Added support for multiple Entry Order fields within one section
+
 1.2
 - Save page now uses native Symphony content pages (improves compatibility with future Symphony releases)
 - Improved the way path to the save page is evaluated
