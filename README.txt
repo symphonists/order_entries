@@ -2,10 +2,10 @@
 Order Entries field
 ------------------------------------
 
-Version: 1.2
+Version: 1.3
 Author: Nick Dunn (nick.dunn@airlock.com)
-Build Date: 2009-03-08
-Requirements: Symphony 2.0.1
+Build Date: 2009-03-20
+Requirements: Symphony 2.0.2
 
 	
 [INSTALLATION]
