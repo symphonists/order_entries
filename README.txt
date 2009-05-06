@@ -1,10 +1,9 @@
-
 Order Entries field
 ------------------------------------
 
-Version: 1.3
+Version: 1.4
 Author: Nick Dunn (nick.dunn@airlock.com)
-Build Date: 2009-03-20
+Build Date: 2009-05-06
 Requirements: Symphony 2.0.2
 
 	
@@ -22,31 +21,4 @@ Requirements: Symphony 2.0.2
 
 2. When viewing the section under the Publish menu, order the table by the Entry Order field.
 
-3. When ordered ascending, drag entries within the table and the orders will be resaved.
-
-[CHANGES]
-
-1.3
-- Added support for multiple Entry Order fields within one section
-
-1.2
-- Save page now uses native Symphony content pages (improves compatibility with future Symphony releases)
-- Improved the way path to the save page is evaluated
-
-1.1
-- Table prefixes no longer hard coded as 'sym_'
-- Check for Publish index page uses Symphony methods rather than splitting the querystring
-
-1.0
-- Fixed bug with changing login methods in 2.0.1 (thanks go to michael-s)
-
-0.3
-- Fixed issue where AJAX call URL was incorrect when Symphony is installed in a subdirectory
-
-0.2
-- Support for multiple pages (removes paging entirely)
-- Added label to page heading to alert user to drag functionality
-- Added login cookie security to AJAX save page
-
-0.1
-- Initial release
+3. When ordered ascending, drag entries within the table and the orders will be re-saved.
