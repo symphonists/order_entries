@@ -85,6 +85,13 @@ jQuery(document).ready(function() {
 
         return false;
     });
+	
+	if ($("#order_number_field").hasClass('yes')) {
+		$('.order-entries thead th a').each(function() {
+			var text = $(this).text();
+			$(this).parent().html(text);
+		});
+	}
 
     $('table.order-entries').live('reorder', function() {
         var t = $(this).addClass('busy');

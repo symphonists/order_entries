@@ -2,11 +2,11 @@
 
 	Class extension_order_entries extends Extension{
 	
-		protected $active_id;
+		protected $active_field;
 	
 		public function about(){
 			return array('name' => 'Order Entries',
-						 'version' => '1.4',
+						 'version' => '1.5',
 						 'release-date' => '2009-05-06',
 						 'author' => array('name' => 'Nick Dunn',
 										   'website' => 'http://airlock.com',
@@ -31,17 +31,17 @@
 		
 		public function appendScriptToHead($context){
 			$this->activeOrderField();
-			if ($this->active_id) {
+			if ($this->active_field) {
 				Administration::instance()->Page->addScriptToHead(URL . '/extensions/order_entries/assets/order.js', 80);
 				$this->_Parent->Configuration->set("pagination_maximum_rows", 99999, "symphony");
 			}
 		}
 		
 		public function appendOrderFieldId($context){			
-			if ($this->active_id) {
-				$span = new XMLElement("span", $this->active_id["id"]);
+			if ($this->active_field) {
+				$span = new XMLElement("span", $this->active_field["id"]);
 				$span->setAttribute("id", "order_number_field");
-				$span->setAttribute("class", "asc");
+				$span->setAttribute("class", $this->active_field["force_sort"]);
 				$span->setAttribute("style", "display:none;");
 				$context["parent"]->Page->Form->appendChild($span);
 			}
@@ -57,9 +57,9 @@
 				// only apply sorting if ascending and entry_order is an Order Entries field
 				if ($section['entry_order_direction'] != 'asc' || !is_numeric($section['entry_order'])) return;
 				
-				$field = $this->_Parent->Database->fetchRow(0, "SELECT id FROM sym_fields WHERE id=" . $section['entry_order'] . " AND type='order_entries'");
+				$field = $this->_Parent->Database->fetchRow(0, "SELECT id, force_sort FROM sym_fields_order_entries WHERE field_id=" . $section['entry_order']);
 				
-				$this->active_id = $field;
+				$this->active_field = $field;
 			}
 		}
 		
@@ -72,6 +72,7 @@
 			return $this->_Parent->Database->query("CREATE TABLE `tbl_fields_order_entries` (
 			  `id` int(11) unsigned NOT NULL auto_increment,
 			  `field_id` int(11) unsigned NOT NULL,
+			  `force_sort` enum('yes','no') default 'no',
 			  PRIMARY KEY  (`id`),
 			  UNIQUE KEY `field_id` (`field_id`)
 			) TYPE=MyISAM");

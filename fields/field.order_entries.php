@@ -60,6 +60,29 @@
 			parent::displaySettingsPanel($wrapper, $errors);
 			$this->appendRequiredCheckbox($wrapper);
 			$this->appendShowColumnCheckbox($wrapper);
+			
+			$label = Widget::Label();
+			$input = Widget::Input('fields['.$this->get('sortorder').'][force_sort]', 'yes', 'checkbox');
+			if($this->get('force_sort') == 'yes') $input->setAttribute('checked', 'checked');			
+			$label->setValue(__('%s Disable sorting of other columns when enabled', array($input->generate())));
+			$wrapper->appendChild($label);
+			
+		}
+		
+		function commit(){
+			if(!parent::commit()) return false;
+			
+			$id = $this->get('id');
+			if($id === false) return false;
+			
+			$fields = array();
+			
+			$fields['field_id'] = $id;
+			$fields['force_sort'] = $this->get('force_sort');
+
+			$this->_engine->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
+			return $this->_engine->Database->insert($fields, 'tbl_fields_' . $this->handle());					
+			
 		}
 
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL){
@@ -70,9 +93,10 @@
 			$max_position = $this->Database->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 			
 			$label->appendChild(Widget::Input('fields'.$fieldnamePrefix.'['.$this->get('element_name').']'.$fieldnamePostfix, (strlen($value) != 0 ? $value : ++$max_position["max"])));
-
+			
 			if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
 			else $wrapper->appendChild($label);
+			
 		}
 
 		public function displayDatasourceFilterPanel(&$wrapper, $data=NULL, $errors=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL){
@@ -82,7 +106,6 @@
 			$wrapper->appendChild($label);
 			
 			$wrapper->appendChild(new XMLElement('p', 'To filter by ranges, add <code>mysql:</code> to the beginning of the filter input. Use <code>value</code> for field name. E.G. <code>mysql: value &gt;= 1.01 AND value &lt;= {$price}</code>', array('class' => 'help')));
-			
 		}
 		
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
