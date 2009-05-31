@@ -57,7 +57,7 @@
 				// only apply sorting if ascending and entry_order is an Order Entries field
 				if ($section['entry_order_direction'] != 'asc' || !is_numeric($section['entry_order'])) return;
 				
-				$field = $this->_Parent->Database->fetchRow(0, "SELECT id, force_sort FROM sym_fields_order_entries WHERE field_id=" . $section['entry_order']);
+				$field = $this->_Parent->Database->fetchRow(0, "SELECT field_id as `id`, force_sort FROM sym_fields_order_entries WHERE field_id=" . $section['entry_order']);
 				
 				$this->active_field = $field;
 			}
