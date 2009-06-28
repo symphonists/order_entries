@@ -2,18 +2,18 @@
 
 	$(document).ready(function() {
 		
-		var table = $("table:first");
-	    var rows = $("tbody tr", table);
+		var table = $('table:first');
+	    var rows = $('tbody tr', table);
 
-	    if (!table || rows.length == 0 || !$("#order_number_field").text()) return;
+	    if (!table || rows.length == 0 || !$('#order_number_field').text()) return;
 
-	    if ($("form:first").attr("action").indexOf("/publish/") == -1) {
+	    if ($('form:first').attr('action').indexOf('/publish/') == -1) {
 	        return false;
 	    }
 
-	    $("h2:first *:first").before(" (drag to reorder) ");
+	    $('h2:first *:first').before(' (drag to reorder) ');
 
-	    $(table).addClass("order-entries");
+	    $(table).addClass('order-entries');
 
 	    // Sortable lists - copied from Symphony's admin.js, because it's not accessible for us (too bad it wasn't made as Symphony.movable :(.
 	    var movable = {
@@ -87,9 +87,9 @@
 	        return false;
 	    });
 		
-		var column_index = $("thead th a.active[href*='&sort="+$("#order_number_field").text()+"&']", table).parent().prevAll().length;
+		var column_index = $('thead th a.active[href*="sort='+$('#order_number_field').text()+'&"]', table).parent().prevAll().length;
 		
-		if ($("#order_number_field").hasClass('yes')) {
+		if ($('#order_number_field').hasClass('yes')) {
 			$('.order-entries thead th').each(function(i) {
 				var text = $(this).text();
 				$(this).html(text);
@@ -100,20 +100,21 @@
 	        var t = $(this).addClass('busy');
 	        $.ajax({
 	            type: 'POST',
-	            url: Symphony.WEBSITE + "/symphony/extension/order_entries/save/",
-	            data: $('input', this).map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&') + "&field=" + $("#order_number_field").text(),
+	            url: Symphony.WEBSITE + '/symphony/extension/order_entries/save/',
+	            data: $('input', this).map(function(e, i) { console.log(this.name); return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + $('#order_number_field').text(),
 	            complete: function(x) {
 	                if (x.status === 200) {
 	                    Symphony.Message.clear('reorder');
 
 	                    // find the Order Field column index
-	                    
-	                    $("tbody tr td:nth-child("+(column_index+1)+")", table).each(function(i) {
-	                        $(this).text((i+1));
+	                    $('tbody tr td:nth-child('+(column_index+1)+')', table).each(function(i, element) {
+							$(this).removeClass('inactive');
+							var text_node = element.childNodes[0];
+							text_node.nodeValue = i + 1;
 	                    });
 
 	                    // deselect rows
-	                    $("tr.selected td:first", table).trigger($.Event('click'));
+	                    $('tr.selected td:first', table).trigger($.Event('click'));
 
 	                } else {
 	                    Symphony.Message.post(Symphony.Language.REORDER_ERROR, 'reorder error');
