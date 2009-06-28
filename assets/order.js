@@ -101,7 +101,7 @@
 	        $.ajax({
 	            type: 'POST',
 	            url: Symphony.WEBSITE + '/symphony/extension/order_entries/save/',
-	            data: $('input', this).map(function(e, i) { console.log(this.name); return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + $('#order_number_field').text(),
+	            data: $('input', this).map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + $('#order_number_field').text(),
 	            complete: function(x) {
 	                if (x.status === 200) {
 	                    Symphony.Message.clear('reorder');
