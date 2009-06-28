@@ -1,10 +1,10 @@
 Order Entries field
 ------------------------------------
 
-Version: 1.5
+Version: 1.6
 Author: Nick Dunn (nick.dunn@airlock.com)
-Build Date: 2009-05-12
-Requirements: Symphony integration version (2.0.3 WIP)
+Build Date: 2009-06-28
+Requirements: Symphony 2.0.3
 
 [INSTALLATION]
 
@@ -21,10 +21,3 @@ Requirements: Symphony integration version (2.0.3 WIP)
 2. When viewing the section under the Publish menu, order the table by the Entry Order field.
 
 3. When ordered ascending, drag entries within the table and the orders will be re-saved.
-
-[UPDATING]
-If you are upgrading from a previous version you will need to make a database change. This assumes you are using the default 'sym_' table prefix.
-
-	ALTER TABLE `sym_fields_order_entries` ADD `force_sort` enum('yes','no') default 'no';
-	
-You will then need to re-save any Section with an Entry Order field included.
