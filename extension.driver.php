@@ -6,8 +6,8 @@
 	
 		public function about(){
 			return array('name' => 'Order Entries',
-						 'version' => '1.5',
-						 'release-date' => '2009-05-06',
+						 'version' => '1.6',
+						 'release-date' => '2009-06-28',
 						 'author' => array('name' => 'Nick Dunn',
 										   'website' => 'http://airlock.com',
 										   'email' => 'nick.dunn@airlock.com')
@@ -52,12 +52,12 @@
 				
 				// find sort settings for this section (sort field ID and direction)
 				$section_handle = Administration::instance()->Page->_context['section_handle'];
-				$section = $this->_Parent->Database->fetchRow(0, "SELECT entry_order, entry_order_direction FROM sym_sections WHERE handle='$section_handle'");
+				$section = $this->_Parent->Database->fetchRow(0, "SELECT entry_order, entry_order_direction FROM tbl_sections WHERE handle='$section_handle'");
 				
 				// only apply sorting if ascending and entry_order is an Order Entries field
 				if ($section['entry_order_direction'] != 'asc' || !is_numeric($section['entry_order'])) return;
 				
-				$field = $this->_Parent->Database->fetchRow(0, "SELECT field_id as `id`, force_sort FROM sym_fields_order_entries WHERE field_id=" . $section['entry_order']);
+				$field = $this->_Parent->Database->fetchRow(0, "SELECT field_id as `id`, force_sort FROM tbl_fields_order_entries WHERE field_id=" . $section['entry_order']);
 				
 				$this->active_field = $field;
 			}
@@ -67,7 +67,13 @@
 			$this->_Parent->Database->query("DROP TABLE `tbl_fields_order_entries`");
 		}
 
-
+		public function update($previousVersion){
+			if(version_compare($previousVersion, '1.6', '<')){
+				$this->_Parent->Database->query("ALTER TABLE `tbl_fields_order_entries` ADD `force_sort` enum('yes','no') DEFAULT 'no'");
+			}
+			return true;
+		}
+		
 		public function install(){
 			return $this->_Parent->Database->query("CREATE TABLE `tbl_fields_order_entries` (
 			  `id` int(11) unsigned NOT NULL auto_increment,
