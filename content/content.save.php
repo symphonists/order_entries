@@ -16,8 +16,8 @@
 			
 		    if(!is_array($items) || empty($items)) exit;
 
-			foreach($items as $id => $position) {
-		        $this->_Parent->Database->query("UPDATE tbl_entries_data_$field_id SET value = '$position' WHERE entry_id='$id'");
+			foreach($items as $entry_id => $position) {
+		        $this->_Parent->Database->query("INSERT INTO tbl_entries_data_$field_id (entry_id, value) VALUES ('$entry_id', '$position') ON DUPLICATE KEY UPDATE `entry_id` = '$entry_id'");
 		    }
 			
 			exit;
