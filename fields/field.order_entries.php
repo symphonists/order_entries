@@ -11,6 +11,8 @@
 			parent::__construct($parent);
 			$this->_name = 'Entry Order';
 			$this->_required = false;
+			
+			$this->set('hide', 'no');
 		}
 
 		function isSortable(){
@@ -61,10 +63,18 @@
 			$this->appendRequiredCheckbox($wrapper);
 			$this->appendShowColumnCheckbox($wrapper);
 			
+			$order = $this->get('sortorder');
+			
 			$label = Widget::Label();
-			$input = Widget::Input('fields['.$this->get('sortorder').'][force_sort]', 'yes', 'checkbox');
+			$input = Widget::Input("fields[{$order}][force_sort]", 'yes', 'checkbox');
 			if($this->get('force_sort') == 'yes') $input->setAttribute('checked', 'checked');			
 			$label->setValue(__('%s Disable sorting of other columns when enabled', array($input->generate())));
+			$wrapper->appendChild($label);
+			
+			$label = Widget::Label();
+			$input = Widget::Input("fields[{$order}][hide]", 'yes', 'checkbox');
+			if ($this->get('hide') == 'yes') $input->setAttribute('checked', 'checked');
+			$label->setValue(__('%s Hide this field on publish page', array($input->generate())));
 			$wrapper->appendChild($label);
 			
 		}
@@ -79,6 +89,7 @@
 			
 			$fields['field_id'] = $id;
 			$fields['force_sort'] = $this->get('force_sort');
+			$fields['hide'] = $this->get('hide');
 
 			$this->_engine->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
 			return $this->_engine->Database->insert($fields, 'tbl_fields_' . $this->handle());					
@@ -86,16 +97,26 @@
 		}
 
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL){
-			$value = $data['value'];		
+			$value = $data['value'];
+					
 			$label = Widget::Label($this->get('label'));
 			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', 'Optional'));
 			
 			$max_position = $this->Database->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 			
-			$label->appendChild(Widget::Input('fields'.$fieldnamePrefix.'['.$this->get('element_name').']'.$fieldnamePostfix, (strlen($value) != 0 ? $value : ++$max_position["max"])));
+			$input = Widget::Input(
+				'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . ']' . $fieldnamePostfix,
+				(strlen($value) != 0 ? $value : ++$max_position["max"]),
+				($this->get('hide') == 'yes') ? 'hidden' : 'text'
+			);
 			
-			if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
-			else $wrapper->appendChild($label);
+			if ($this->get('hide') != 'yes') {
+				$label->appendChild($input);			
+				if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
+				else $wrapper->appendChild($label);
+			} else {
+				$wrapper->appendChild($input);
+			}		
 			
 		}
 

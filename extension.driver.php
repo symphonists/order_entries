@@ -6,8 +6,8 @@
 	
 		public function about(){
 			return array('name' => 'Order Entries',
-						 'version' => '1.7',
-						 'release-date' => '2009-09-27',
+						 'version' => '1.8',
+						 'release-date' => '2009-09-28',
 						 'author' => array('name' => 'Nick Dunn',
 										   'website' => 'http://airlock.com',
 										   'email' => 'nick.dunn@airlock.com')
@@ -71,6 +71,9 @@
 			if(version_compare($previousVersion, '1.6', '<')){
 				$this->_Parent->Database->query("ALTER TABLE `tbl_fields_order_entries` ADD `force_sort` enum('yes','no') DEFAULT 'no'");
 			}
+			if(version_compare($previousVersion, '1.8', '<')){
+				$this->_Parent->Database->query("ALTER TABLE `tbl_fields_order_entries` ADD `hide` enum('yes','no') DEFAULT 'no'");
+			}
 			return true;
 		}
 		
@@ -79,6 +82,7 @@
 			  `id` int(11) unsigned NOT NULL auto_increment,
 			  `field_id` int(11) unsigned NOT NULL,
 			  `force_sort` enum('yes','no') default 'no',
+			  `hide` enum('yes','no') default 'no',
 			  PRIMARY KEY  (`id`),
 			  UNIQUE KEY `field_id` (`field_id`)
 			) TYPE=MyISAM");
