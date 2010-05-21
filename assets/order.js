@@ -66,8 +66,8 @@
 	                b = target.offset().top;
 
 	            movable.target = target;
-	            movable.min    = Math.min(b, a + (target.prev().offset().top || -Infinity));
-	            movable.max    = Math.max(a + b, b + (target.next().height() ||  Infinity));
+				movable.min = Math.min(b, a + (target.prev().offset() ? target.prev().offset().top : -Infinity));
+				movable.max    = Math.max(a + b, b + (target.next().height() ||  Infinity));
 	        }
 	    };
 
