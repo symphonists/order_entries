@@ -11,7 +11,9 @@
 	        return false;
 	    }
 
-	    $('h2:first *:first').before(' (drag to reorder) ');
+		Symphony.Language.add({ 'drag to reorder': false });
+
+	    $('h2:first *:first').before(' (' + Symphony.Language.get('drag to reorder') + ') ');
 
 	    $(table).addClass('order-entries');
 
