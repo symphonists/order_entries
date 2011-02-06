@@ -1,130 +1,98 @@
-(function($) {
+Symphony.Language.add({
+	'drag to reorder': false,
+	'Reordering was unsuccessful.': false,
+	'Entry order saved.': false
+});
 
-	$(document).ready(function() {
+OrderEntries = {
+	
+	table: null,
+	config: null,
+	h2: null,
+	column_index: null,
+	
+	init: function() {
+		var self = this;
 		
-		var table = $('table:first');
-	    var rows = $('tbody tr', table);
-
-	    if (!table || rows.length == 0 || !$('#order_number_field').text()) return;
-
-	    if ($('form:first').attr('action').indexOf('/publish/') == -1) {
-	        return false;
-	    }
-
-	    $('h2:first *:first').before(' (drag to reorder) ');
-
-	    $(table).addClass('order-entries');
-
-	    // Sortable lists - copied from Symphony's admin.js, because it's not accessible for us (too bad it wasn't made as Symphony.movable :(.
-	    var movable = {
-	        move: function(e) {
-	            var t,
-	                n,
-	                y = e.pageY;
-
-	            if (y < movable.min) {
-	                t = movable.target.prev();
-	                for (;;) {
-	                    movable.delta--;
-	                    n = t.prev();
-	                    if (n.length === 0 || y >= (movable.min -= n.height())) {
-	                        movable.target.insertBefore(t);
-	                        break;
-	                    }
-	                    t = n;
-	                }
-	            } else if (y > movable.max) {
-	                t = movable.target.next();
-	                for (;;) {
-	                    movable.delta++;
-	                    n = t.next();
-	                    if (n.length === 0 || y <= (movable.max += n.height())) {
-	                        movable.target.insertAfter(t);
-	                        break;
-	                    }
-	                    t = n;
-	                }
-	            } else {
-	                return;
-	            }
-
-	            movable.update(movable.target);
-	            movable.target.parent().children().each(function(i) { $(this).toggleClass('odd', i % 2 === 0); });
-	        },
-	        drop: function() {
-	            $(document).unbind('mousemove', movable.move);
-	            $(document).unbind('mouseup', movable.drop);
-
-	            movable.target.removeClass('movable');
-
-	            if (movable.delta) {
-	                movable.target.trigger($.Event('reorder'));
-	            }
-	        },
-	        update: function(target) {
-	            var a = target.height(),
-	                b = target.offset().top,
-	                prev_offset = (target.prev().length) ? target.prev().offset().top : 0;
-
-	            movable.target = target;
-	            movable.min    = Math.min(b, a + (prev_offset || -Infinity));
-	            movable.max    = Math.max(a + b, b + (target.next().height() ||  Infinity));
-	        }
-	    };
-
-
-	    // Based on code from Symphony's admin.js
-	    $('.order-entries tr').live('mousedown', function(e) {
-	        if (!/^(?:h4|td)$/i.test(e.target.nodeName)) {
-	            return true;
-	        }
-
-	        movable.update($(this).addClass('movable'));
-	        movable.delta = 0;
-
-	        $(document).mousemove(movable.move);
-	        $(document).mouseup(movable.drop);
-
-	        return false;
-	    });
+		this.table = jQuery('table');
+		if(!this.table.find('tbody tr').length) return;
 		
-		var column_index = $('thead th a.active[href*="sort='+$('#order_number_field').text()+'&"]', table).parent().prevAll().length;
+		this.config = Symphony.Context.get('order-entries');
 		
-		if ($('#order_number_field').hasClass('yes')) {
-			$('.order-entries thead th').each(function(i) {
-				var text = $(this).text();
-				$(this).html(text);
-			});
-		}
+		this.h2 = jQuery('h2');
+		this.column_index = this.table.find('thead th a.active[href*="sort=' + this.config.id + '&"]').parent().prevAll().length;
+		
+		this.h2.find('span').append('<span class="inactive" style="float:none;margin-left:5px;">(' + Symphony.Language.get('drag to reorder') + ')</span>');
+		
+		// Orderable tables
+		this.table.symphonyOrderable({
+			items: 'tr',
+			handles: 'td'
+		});
 
-	    $('table.order-entries').live('reorder', function() {
-	        var t = $(this).addClass('busy');
-	        $.ajax({
-	            type: 'POST',
-	            url: Symphony.WEBSITE + '/symphony/extension/order_entries/save/',
-	            data: $('input', this).map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + $('#order_number_field').text(),
-	            complete: function(x) {
-	                if (x.status === 200) {
-	                    Symphony.Message.clear('reorder');
+		// Don't start ordering while clicking on links
+		this.table.find('a').mousedown(function(event) {
+			event.stopPropagation();
+		});
+		
+		// unbind any previous ordering (Symphony's default callbacks)
+		this.table.unbind('orderstart');
+		this.table.unbind('orderstop');
 
+		// Store current sort order
+		this.table.live('orderstart', function() {
+			old_sorting = self.table.find('input').map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&');
+		});
+
+		// Process sort order
+		this.table.live('orderstop', function() {
+			self.table.addClass('busy');
+
+			// Get new sort order
+			var new_sorting = self.table.find('input').map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&');
+
+			// Store new sort order
+			if(new_sorting != old_sorting) {
+
+				// Update items
+				self.table.trigger('orderchange');
+
+				// Send request
+				jQuery.ajax({
+					type: 'POST',
+					url: Symphony.WEBSITE + '/symphony/extension/order_entries/save/',
+					data: jQuery('input', this).map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + self.config.id,
+					success: function() {
+						Symphony.Message.clear('reorder');
+						Symphony.Message.post(Symphony.Language.get('Entry order saved.'), 'reorder success');
+						Symphony.Message.fade('silence', 2000);
+					},
+					error: function() {
+						Symphony.Message.post(Symphony.Language.get('Reordering was unsuccessful.'), 'reorder error');
+						Symphony.Message.fade('silence', 2000);
+					},
+					complete: function() {
+						self.table.removeClass('busy').find('tr').removeClass('selected');
+						old_sorting = null;
+						
 	                    // find the Order Field column index
-	                    $('tbody tr td:nth-child('+(column_index+1)+')', table).each(function(i, element) {
-							$(this).removeClass('inactive');
-							var text_node = element.childNodes[0];
-							text_node.nodeValue = i + 1;
+	                    self.table.find('tbody tr td:nth-child(' + (self.column_index + 1) + ')').each(function(i, element) {
+							jQuery(this).text(i + 1);
 	                    });
+						
+					}
+				});
+			}
+			else {
+				self.table.removeClass('busy');
+			}
 
-	                    // deselect rows
-	                    $('tr.selected td:first', table).trigger($.Event('click'));
-
-	                } else {
-	                    Symphony.Message.post(Symphony.Language.REORDER_ERROR, 'reorder error');
-	                }
-	                t.removeClass('busy');
-	            }
-	        });
-	    });
+		});
 		
-	});
+	}
+	
+};
 
-})(jQuery.noConflict());
+jQuery(document).ready(function() {
+	OrderEntries.init();
+});

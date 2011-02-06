@@ -2,12 +2,10 @@
 
 	Class extension_order_entries extends Extension{
 	
-		protected $active_field;
-	
 		public function about(){
 			return array('name' => 'Order Entries',
-						 'version' => '1.8',
-						 'release-date' => '2009-09-28',
+						 'version' => '1.9',
+						 'release-date' => '2011-02-06',
 						 'author' => array('name' => 'Nick Dunn',
 										   'website' => 'http://airlock.com',
 										   'email' => 'nick.dunn@airlock.com')
@@ -16,51 +14,53 @@
 		
 		public function getSubscribedDelegates(){
 			return array(
-						array(
-							'page' => '/backend/',
-							'delegate' => 'InitaliseAdminPageHead',
-							'callback' => 'appendScriptToHead'
-						),
-						array(
-							'page' => '/backend/',
-							'delegate' => 'AppendElementBelowView',
-							'callback' => 'appendOrderFieldId'
-						),						
+					array(
+						'page' => '/backend/',
+						'delegate' => 'InitaliseAdminPageHead',
+						'callback' => 'appendScriptToHead'
+					)
 			);
 		}
 		
 		public function appendScriptToHead($context){
-			$this->activeOrderField();
-			if ($this->active_field) {
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/order_entries/assets/order.js', 80);
-				$this->_Parent->Configuration->set("pagination_maximum_rows", 99999, "symphony");
-			}
-		}
-		
-		public function appendOrderFieldId($context){			
-			if ($this->active_field) {
-				$span = new XMLElement("span", $this->active_field["id"]);
-				$span->setAttribute("id", "order_number_field");
-				$span->setAttribute("class", $this->active_field["force_sort"]);
-				$span->setAttribute("style", "display:none;");
-				$context["parent"]->Page->Form->appendChild($span);
-			}
-		}
-		
-		private function activeOrderField() {
-			if(isset(Administration::instance()->Page->_context['section_handle']) && Administration::instance()->Page->_context['page'] == 'index'){
+			
+			$page_callback = Administration::instance()->getPageCallback();
+			$page_callback = $page_callback['context'];
+			
+			if(isset($page_callback['section_handle']) && $page_callback['page'] == 'index'){
 				
 				// find sort settings for this section (sort field ID and direction)
-				$section_handle = Administration::instance()->Page->_context['section_handle'];
-				$section = $this->_Parent->Database->fetchRow(0, "SELECT entry_order, entry_order_direction FROM tbl_sections WHERE handle='$section_handle'");
+				$section_handle = $page_callback['section_handle'];
+				$section = Symphony::Database()->fetchRow(0, "SELECT entry_order, entry_order_direction FROM tbl_sections WHERE handle='$section_handle'");
 				
-				// only apply sorting if ascending and entry_order is an Order Entries field
+				// we only want a valid entry order field and ascending order only
 				if ($section['entry_order_direction'] != 'asc' || !is_numeric($section['entry_order'])) return;
 				
-				$field = $this->_Parent->Database->fetchRow(0, "SELECT field_id as `id`, force_sort FROM tbl_fields_order_entries WHERE field_id=" . $section['entry_order']);
+				$order_entries_field = Symphony::Database()->fetchRow(0, "SELECT field_id as `id`, force_sort FROM tbl_fields_order_entries WHERE field_id=" . $section['entry_order']);
 				
-				$this->active_field = $field;
+				if($order_entries_field) {
+					
+					Administration::instance()->Page->addElementToHead(
+						new XMLElement(
+							'script',
+							"Symphony.Context.add('order-entries', " . json_encode(array(
+								'id' => $order_entries_field['id'],
+								'force-sort' => $order_entries_field['force_sort'],
+							)) . ");",
+							array('type' => 'text/javascript')
+						), time()
+					);
+					
+					Administration::instance()->Page->addScriptToHead(
+						URL . '/extensions/order_entries/assets/order.js',
+						time()
+					);
+					
+					Symphony::Configuration()->set("pagination_maximum_rows", 99999, "symphony");
+					
+				}
 			}
+			
 		}
 		
 		public function uninstall(){

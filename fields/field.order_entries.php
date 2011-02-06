@@ -102,7 +102,7 @@
 			$label = Widget::Label($this->get('label'));
 			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', 'Optional'));
 			
-			$max_position = $this->Database->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
+			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 			
 			$input = Widget::Input(
 				'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . ']' . $fieldnamePostfix,
