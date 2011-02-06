@@ -4,7 +4,7 @@
 	
 		public function about(){
 			return array('name' => 'Order Entries',
-						 'version' => '1.9',
+						 'version' => '1.9.1',
 						 'release-date' => '2011-02-06',
 						 'author' => array('name' => 'Nick Dunn',
 										   'website' => 'http://airlock.com',
