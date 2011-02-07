@@ -1,6 +1,6 @@
 # Order Entries field
 
-* Version: 1.9.2
+* Version: 1.9.3
 * Author: Nick Dunn (http://nick-dunn.co.uk)
 * Build Date: 2011-02-07
 * Requirements: Symphony 2.2
