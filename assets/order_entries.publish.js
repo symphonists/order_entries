@@ -22,7 +22,7 @@ OrderEntries = {
 		this.h2 = jQuery('h2');
 		this.column_index = this.table.find('thead th a.active[href*="sort=' + this.config.id + '&"]').parent().prevAll().length;
 		
-		this.h2.find('span').append('<span class="inactive" style="float:none;margin-left:5px;">(' + Symphony.Language.get('drag to reorder') + ')</span>');
+		this.h2.find('> span:first').after('<span class="inactive" style="float:none;margin-left:5px;">(' + Symphony.Language.get('drag to reorder') + ')</span>');
 		
 		// Orderable tables
 		this.table.symphonyOrderable({

@@ -52,7 +52,7 @@
 					);
 					
 					Administration::instance()->Page->addScriptToHead(
-						URL . '/extensions/order_entries/assets/order.js',
+						URL . '/extensions/order_entries/assets/order_entries.publish.js',
 						time()
 					);
 					
