@@ -91,8 +91,8 @@
 			$fields['force_sort'] = $this->get('force_sort');
 			$fields['hide'] = $this->get('hide');
 
-			$this->_engine->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
-			return $this->_engine->Database->insert($fields, 'tbl_fields_' . $this->handle());					
+			Symphony::Engine()->Database->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
+			return Symphony::Engine()->Database->insert($fields, 'tbl_fields_' . $this->handle());					
 			
 		}
 
