@@ -9,7 +9,7 @@
 		
 		function __construct(&$parent){
 			parent::__construct($parent);
-			$this->_name = 'Entry Order';
+			$this->_name = __('Entry Order');
 			$this->_required = false;
 			
 			$this->set('hide', 'no');
