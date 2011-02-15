@@ -1,7 +1,7 @@
 <?php
 
 	$about = array(
-		'name' => '',
+		'name' => 'Română',
 		'author' => array(
 			'name' => 'Vlad Ghita',
 			'email' => 'vlad_micutul@yahoo.com',
