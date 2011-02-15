@@ -77,7 +77,7 @@ OrderEntries = {
 						
 	                    // find the Order Field column index
 	                    self.table.find('tbody tr td:nth-child(' + (self.column_index + 1) + ')').each(function(i, element) {
-							jQuery(this).text(i + 1);
+							jQuery(this).find('.order').text(i + 1);
 	                    });
 						
 					}

@@ -180,6 +180,10 @@
 			return true;
 			
 		}
+		
+		public function prepareTableValue($data, XMLElement $link = null) {
+			return sprintf('<span class="order">%d</span>', $data['value']);
+		}
 				
 	}
 
