@@ -100,7 +100,7 @@
 			$value = $data['value'];
 					
 			$label = Widget::Label($this->get('label'));
-			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', 'Optional'));
+			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
 			
 			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 			
@@ -125,20 +125,19 @@
 			$label = Widget::Label('Value');
 			$label->appendChild(Widget::Input('fields[filter]'.($fieldnamePrefix ? '['.$fieldnamePrefix.']' : '').'['.$this->get('id').']'.($fieldnamePostfix ? '['.$fieldnamePostfix.']' : ''), ($data ? General::sanitize($data) : NULL)));	
 			$wrapper->appendChild($label);
-			
-			$wrapper->appendChild(new XMLElement('p', 'To filter by ranges, add <code>mysql:</code> to the beginning of the filter input. Use <code>value</code> for field name. E.G. <code>mysql: value &gt;= 1.01 AND value &lt;= {$price}</code>', array('class' => 'help')));
+			$wrapper->appendChild(new XMLElement('p', __('To filter by ranges, add <code>%s</code> to the beginning of the filter input. Use <code>%s</code> for field name. E.G. <code>%s</code>', array('mysql:', 'value', 'mysql: value &gt;= 1.01 AND value &lt;= {$price}')), array('class' => 'help')));
 		}
 		
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
 			$message = NULL;
 			
 			if($this->get('required') == 'yes' && strlen($data) == 0){
-				$message = 'This is a required field.';
+				$message = __('This is a required field.');
 				return self::__MISSING_FIELDS__;
 			}
 			
 			if(strlen($data) > 0 && !is_numeric($data)){
-				$message = 'Must be a number.';
+				$message = __('Must be a number.');
 				return self::__INVALID_FIELDS__;	
 			}
 						
