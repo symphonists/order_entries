@@ -1,4 +1,4 @@
-# Order Entries field
+# Order Entries
 
 * Version: 1.9.5
 * Author: Nick Dunn (http://nick-dunn.co.uk)
@@ -19,7 +19,7 @@
 
 ## Compatibility
 
-Symphony | Recommended extension version
+Symphony | Order Entries
 ------------- | -------------
-2.0.3 to 2.1.* | [1.9](https://github.com/nickdunn/order_entries/commits/1.9)
+2.0.3 – 2.1.* | [1.9](https://github.com/nickdunn/order_entries/commits/1.9)
 2.2.* | [latest](https://github.com/nickdunn/order_entries)
