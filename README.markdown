@@ -1,8 +1,8 @@
 # Order Entries field
 
-* Version: 1.9.3
+* Version: 1.9.4
 * Author: Nick Dunn (http://nick-dunn.co.uk)
-* Build Date: 2011-02-07
+* Build Date: 2011-02-15
 * Requirements: Symphony 2.2
 
 ## Installation
