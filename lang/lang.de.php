@@ -28,6 +28,6 @@
 		'%s Diese Feld in der Einzelansicht verbergen',
 		
 		'drag to reorder' =>
-		'Zum Sortieren Einträge verschieben'
+		'zum Sortieren Einträge verschieben'
 		
 	);
