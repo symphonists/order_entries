@@ -1,6 +1,6 @@
 # Order Entries field
 
-* Version: 1.9.4
+* Version: 1.9.5
 * Author: Nick Dunn (http://nick-dunn.co.uk)
 * Build Date: 2011-02-15
 * Requirements: Symphony 2.2
@@ -19,7 +19,7 @@
 
 ## Compatibility
 
-First Header  | Second Header
+Symphony | Recommended extension version
 ------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell
+2.0.3 to 2.1.* | [1.9](https://github.com/nickdunn/order_entries/commits/1.9)
+2.2.* | [latest](https://github.com/nickdunn/order_entries)
