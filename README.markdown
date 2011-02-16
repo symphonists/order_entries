@@ -1,8 +1,8 @@
 # Order Entries
 
-* Version: 1.9.5
+* Version: 1.9.6
 * Author: Nick Dunn (http://nick-dunn.co.uk)
-* Build Date: 2011-02-15
+* Build Date: 2011-02-16
 * Requirements: Symphony 2.2
 
 ## Installation
