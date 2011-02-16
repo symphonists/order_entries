@@ -68,16 +68,16 @@
 
 		public function update($previousVersion){
 			if(version_compare($previousVersion, '1.6', '<')){
-				$this->_Parent->Database->query("ALTER TABLE `tbl_fields_order_entries` ADD `force_sort` enum('yes','no') DEFAULT 'no'");
+				Symphony::Database()->query("ALTER TABLE `tbl_fields_order_entries` ADD `force_sort` enum('yes','no') DEFAULT 'no'");
 			}
 			if(version_compare($previousVersion, '1.8', '<')){
-				$this->_Parent->Database->query("ALTER TABLE `tbl_fields_order_entries` ADD `hide` enum('yes','no') DEFAULT 'no'");
+				Symphony::Database()->query("ALTER TABLE `tbl_fields_order_entries` ADD `hide` enum('yes','no') DEFAULT 'no'");
 			}
 			return true;
 		}
 		
 		public function install(){
-			return $this->_Parent->Database->query("CREATE TABLE `tbl_fields_order_entries` (
+			return Symphony::Database()->query("CREATE TABLE `tbl_fields_order_entries` (
 			  `id` int(11) unsigned NOT NULL auto_increment,
 			  `field_id` int(11) unsigned NOT NULL,
 			  `force_sort` enum('yes','no') default 'no',
