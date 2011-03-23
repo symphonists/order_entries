@@ -24,6 +24,18 @@ OrderEntries = {
 		
 		this.h2.find('> span:first').after('<span class="inactive" style="margin-left:5px;">(' + Symphony.Language.get('drag to reorder') + ')</span>');
 		
+		// disable sorting of other columns by removing the anchors
+		if(this.config['force-sort'] == 'yes') {
+			this.table.find('thead th').each(function() {
+				// don't touch the order entries field, leave sortable
+				if(jQuery(this).find('[href*="sort=' + self.config.id + '&"]').length) return;
+				// get the plain text of the cell
+				var text = jQuery(this).text();
+				// replace contents with plain text
+				jQuery(this).html(text);
+			});
+		}
+		
 		// Orderable tables
 		this.table.symphonyOrderable({
 			items: 'tr',
