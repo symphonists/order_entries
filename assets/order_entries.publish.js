@@ -28,7 +28,7 @@ OrderEntries = {
 		if(this.config['force-sort'] == 'yes') {
 			this.table.find('thead th').each(function() {
 				// don't touch the order entries field, leave sortable
-				if(jQuery(this).find('[href*="sort=' + self.config.id + '&"]').length) return;
+				if(jQuery(this).find('a[href*="sort=' + self.config.id + '&"]').length) return;
 				// get the plain text of the cell
 				var text = jQuery(this).text();
 				// replace contents with plain text
