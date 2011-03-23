@@ -14,7 +14,7 @@ OrderEntries = {
 	init: function() {
 		var self = this;
 		
-		this.table = jQuery('table');
+		this.table = jQuery('#contents > form > table');
 		if(!this.table.find('tbody tr').length) return;
 		
 		this.config = Symphony.Context.get('order-entries');
