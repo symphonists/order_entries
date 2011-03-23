@@ -72,7 +72,7 @@ OrderEntries = {
 				// Send request
 				jQuery.ajax({
 					type: 'POST',
-					url: Symphony.WEBSITE + '/symphony/extension/order_entries/save/',
+					url: Symphony.Context.get('root') + '/symphony/extension/order_entries/save/',
 					data: jQuery('input', this).map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + self.config.id,
 					success: function() {
 						Symphony.Message.clear('reorder');
