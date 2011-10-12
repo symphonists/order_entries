@@ -4,8 +4,8 @@
 	
 		public function about(){
 			return array('name' => 'Order Entries',
-						 'version' => '1.9.6',
-						 'release-date' => '2011-02-16',
+						 'version' => '1.9.7',
+						 'release-date' => '2011-10-12',
 						 'author' => array('name' => 'Nick Dunn',
 										   'website' => 'http://nick-dunn.co.uk')
 				 		);
