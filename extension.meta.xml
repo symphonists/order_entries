@@ -6,7 +6,7 @@
 
 	<description lang="en">Allow drag-and-drop re-ordering of entries.</description>
 
-	<url type="repo">https://github.com/nickdunn/order_entries</url>
+	<repo type="github">https://github.com/nickdunn/order_entries</repo>
 	
 	<types>
 		<type>Workflow</type>

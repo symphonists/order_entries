@@ -1,10 +1,5 @@
 # Order Entries
 
-* Version: 1.9.7
-* Author: Nick Dunn (http://nick-dunn.co.uk)
-* Build Date: 2011-10-12
-* Requirements: Symphony 2.2
-
 ## Installation
 
 1. Upload the 'order_entries' folder in this archive to your Symphony 'extensions' folder.
