@@ -1,7 +1,7 @@
 <?php
 	
 	Class fieldOrder_Entries extends Field{
-	
+		
 		const SIMPLE = 0;
 		const REGEXP = 1;
 		const RANGE = 3;
@@ -14,7 +14,7 @@
 			
 			$this->set('hide', 'no');
 		}
-
+		
 		function isSortable(){
 			return true;
 		}
@@ -22,7 +22,7 @@
 		function canFilter(){
 			return true;
 		}
-
+		
 		function allowDatasourceOutputGrouping(){
 			return true;
 		}
@@ -30,11 +30,11 @@
 		function allowDatasourceParamOutput(){
 			return true;
 		}
-
+		
 		function canPrePopulate(){
 			return true;
 		}
-
+		
 		function groupRecords($records){
 			
 			if(!is_array($records) || empty($records)) return;
@@ -49,15 +49,15 @@
 				if(!isset($groups[$this->get('element_name')][$value])){
 					$groups[$this->get('element_name')][$value] = array('attr' => array('value' => $value),
 																		 'records' => array(), 'groups' => array());
-				}	
-																					
+				}
+				
 				$groups[$this->get('element_name')][$value]['records'][] = $r;
-								
+				
 			}
-
+			
 			return $groups;
 		}
-
+		
 		function displaySettingsPanel(&$wrapper, $errors=NULL){
 			parent::displaySettingsPanel($wrapper, $errors);
 			$this->appendRequiredCheckbox($wrapper);
@@ -67,7 +67,7 @@
 			
 			$label = Widget::Label();
 			$input = Widget::Input("fields[{$order}][force_sort]", 'yes', 'checkbox');
-			if($this->get('force_sort') == 'yes') $input->setAttribute('checked', 'checked');			
+			if($this->get('force_sort') == 'yes') $input->setAttribute('checked', 'checked');
 			$label->setValue(__('%s Disable sorting of other columns when enabled', array($input->generate())));
 			$wrapper->appendChild($label);
 			
@@ -90,15 +90,15 @@
 			$fields['field_id'] = $id;
 			$fields['force_sort'] = $this->get('force_sort');
 			$fields['hide'] = $this->get('hide');
-
+			
 			Symphony::Database()->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
-			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());					
+			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
 			
 		}
-
+		
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL){
 			$value = $data['value'];
-					
+			
 			$label = Widget::Label($this->get('label'));
 			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
 			
@@ -110,16 +110,16 @@
 				($this->get('hide') == 'yes') ? 'hidden' : 'text'
 			);
 			
-			if ($this->get('hide') != 'yes') {
-				$label->appendChild($input);			
+			if ($this->get('hide') != 'yes'){
+				$label->appendChild($input);
 				if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
 				else $wrapper->appendChild($label);
 			} else {
 				$wrapper->appendChild($input);
-			}		
+			}
 			
 		}
-
+		
 		public function displayDatasourceFilterPanel(&$wrapper, $data=NULL, $errors=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL){
 			$wrapper->appendChild(new XMLElement('h4', $this->get('label') . ' <i>'.$this->Name().'</i>'));
 			$label = Widget::Label('Value');
@@ -138,10 +138,10 @@
 			
 			if(strlen($data) > 0 && !is_numeric($data)){
 				$message = __('Must be a number.');
-				return self::__INVALID_FIELDS__;	
+				return self::__INVALID_FIELDS__;
 			}
-						
-			return self::__OK__;		
+			
+			return self::__OK__;
 		}
 		
 		public function createTable(){
@@ -158,8 +158,8 @@
 				) TYPE=MyISAM;"
 			
 			);
-		}		
-
+		}
+		
 		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation=false){
 			
 			## Check its not a regexp
@@ -172,7 +172,7 @@
 				$joins .= " LEFT JOIN `tbl_entries_data_$field_id` AS `t$field_id` ON (`e`.`id` = `t$field_id`.entry_id) ";
 				$where .= " AND $expression ";
 				
-			}			
+			}
 			
 			else parent::buildDSRetrivalSQL($data, $joins, $where, $andOperation);
 			
@@ -180,10 +180,18 @@
 			
 		}
 		
-		public function prepareTableValue($data, XMLElement $link = null) {
+		public function prepareTableValue($data, XMLElement $link = null){
 			return sprintf('<span class="order">%d</span>', $data['value']);
 		}
-				
+		
+		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null, $entry_id = null){
+			$wrapper->appendChild(new XMLElement($this->get('element_name'), $data['value']));
+		}
+		
+		public function getParameterPoolValue(Array $data){
+			return $data['value'];
+		}
+		
 	}
 
 ?>
