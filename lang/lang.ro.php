@@ -15,14 +15,14 @@
 	 */
 	$dictionary = array(
 	
-		'drag to reorder' => 
+		'drag to reorder' =>
 		'trage pentru rearanjare',
 
-		'Entry order saved.' => 
+		'Entry order saved.' =>
 		'Ordinea înregistrărilor salvată.',
 
-		'Entry Order' => 
-		'Sortare Înregistrări',
+		'Entry Order' =>
+		false,
 
 		'%s Disable sorting of other columns when enabled' =>
 		'%s Când este activată, dezactivează sortarea prin celelalte coloane ',
