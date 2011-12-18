@@ -7,8 +7,8 @@
 		const RANGE = 3;
 		const ERROR = 4;	
 		
-		function __construct(&$parent){
-			parent::__construct($parent);
+		function __construct(){
+			parent::__construct();
 			$this->_name = __('Entry Order');
 			$this->_required = false;
 			
