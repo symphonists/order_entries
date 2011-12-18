@@ -19,10 +19,10 @@ OrderEntries = {
 		
 		this.config = Symphony.Context.get('order-entries');
 		
-		this.h2 = jQuery('#contents > h2');
+		this.h2 = jQuery('#breadcrumbs > h2');
 		this.column_index = this.table.find('thead th a.active[href*="sort=' + this.config.id + '&"]').parent().prevAll().length;
 		
-		this.h2.find('> span:first').after('<span class="inactive" style="margin-left:5px;">(' + Symphony.Language.get('drag to reorder') + ')</span>');
+		this.h2.after('<span class="order-entries-label">(' + Symphony.Language.get('drag to reorder') + ')</span>');
 		
 		// disable sorting of other columns by removing the anchors
 		if(this.config['force-sort'] == 'yes') {
@@ -48,17 +48,20 @@ OrderEntries = {
 		});
 		
 		// unbind any previous ordering (Symphony's default callbacks)
-		this.table.unbind('orderstart');
-		this.table.unbind('orderstop');
+		this.table.off('orderstart');
+		this.table.off('orderstop');
 
 		// Store current sort order
-		this.table.live('orderstart', function() {
+		this.table.on('orderstart.orderable', function() {
+			console.log('orderstart')
 			old_sorting = self.table.find('input').map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&');
 		});
 
 		// Process sort order
-		this.table.live('orderstop', function() {
+		this.table.on('orderstop.orderable', function() {
 			self.table.addClass('busy');
+			
+			console.log('orderstop');
 
 			// Get new sort order
 			var new_sorting = self.table.find('input').map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&');
@@ -76,8 +79,8 @@ OrderEntries = {
 					data: jQuery('input', this).map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + self.config.id,
 					success: function() {
 						Symphony.Message.clear('reorder');
-						Symphony.Message.post(Symphony.Language.get('Entry order saved.'), 'reorder success');
-						Symphony.Message.fade('silence', 2000);
+						//Symphony.Message.post(Symphony.Language.get('Entry order saved.'), 'reorder success');
+						//Symphony.Message.fade('silence', 2000);
 					},
 					error: function() {
 						Symphony.Message.post(Symphony.Language.get('Reordering was unsuccessful.'), 'reorder error');

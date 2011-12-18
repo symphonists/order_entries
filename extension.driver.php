@@ -55,6 +55,12 @@
 						time()
 					);
 					
+					Administration::instance()->Page->addStylesheetToHead(
+						URL . '/extensions/order_entries/assets/order_entries.publish.css',
+						'screen',
+						time()
+					);
+					
 					Symphony::Configuration()->set("pagination_maximum_rows", 99999, "symphony");
 					
 				}
