@@ -22,6 +22,9 @@
 	</authors>
 	
 	<releases>
+		<release version="1.9.8" date="2011-12-19" min="2.2.2">
+			* Added `appendFormattedElement` and `getParameterPoolValue` methods to prevent bad default output (thanks DavidOliver!)
+		</release>
 		<release version="1.9.7" date="2011-10-12" min="2.2.2" />
 		<release version="1.9.6" date="2011-02-16" min="2.2" />
 		<release version="1.9.5" date="2011-05-21" min="2.0.3" max="2.1.x" />
