@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<extension id="order_entries">
+<extension id="order_entries" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 	
 	<name>Order Entries</name>
 
