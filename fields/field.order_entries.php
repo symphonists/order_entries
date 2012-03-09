@@ -7,8 +7,8 @@
 		const RANGE = 3;
 		const ERROR = 4;	
 		
-		function __construct(&$parent){
-			parent::__construct($parent);
+		function __construct(){
+			parent::__construct();
 			$this->_name = __('Entry Order');
 			$this->_required = false;
 			
@@ -106,7 +106,7 @@
 			
 			$input = Widget::Input(
 				'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . ']' . $fieldnamePostfix,
-				(strlen($value) != 0 ? $value : ++$max_position["max"]),
+				(strlen($value) !== 0 ? (string)$value : (string)++$max_position["max"]),
 				($this->get('hide') == 'yes') ? 'hidden' : 'text'
 			);
 			
