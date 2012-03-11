@@ -20,8 +20,11 @@
 			if(isset($page_callback['section_handle']) && $page_callback['page'] == 'index'){
 				
 				// find sort settings for this section (sort field ID and direction)
+				$section_id = SectionManager::fetchIDFromHandle($page_callback['section_handle']);
+				if(!$section_id) return;
+				
 				$section = SectionManager::fetch(SectionManager::fetchIDFromHandle($page_callback['section_handle']));
-								
+				
 				// we only want a valid entry order field and ascending order only
 				if ($section->getSortingOrder() !== 'asc' || !is_numeric($section->getSortingField())) return;
 				
