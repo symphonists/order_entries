@@ -160,7 +160,7 @@
 			);
 		}
 		
-		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation=false){
+		function buildDSRetrievalSQL($data, &$joins, &$where, $andOperation=false){
 			
 			## Check its not a regexp
 			if(preg_match('/^mysql:/i', $data[0])){
@@ -174,7 +174,7 @@
 				
 			}
 			
-			else parent::buildDSRetrivalSQL($data, $joins, $where, $andOperation);
+			else parent::buildDSRetrievalSQL($data, $joins, $where, $andOperation);
 			
 			return true;
 			
