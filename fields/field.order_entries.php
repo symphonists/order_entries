@@ -34,6 +34,14 @@
 		function canPrePopulate(){
 			return true;
 		}
+
+		function processRawFieldData($data, &$status, $simulate=false, $entry_id=null) {
+
+			Symphony::Database()->query("UPDATE tbl_entries_data_{$this->get('id')} SET value = (value + 1) WHERE value >= ".$data);
+			return array(
+				'value' => $data,
+			);
+		}
 		
 		function groupRecords($records){
 			
