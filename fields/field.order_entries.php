@@ -60,23 +60,27 @@
 		
 		function displaySettingsPanel(&$wrapper, $errors=NULL){
 			parent::displaySettingsPanel($wrapper, $errors);
-			$this->appendRequiredCheckbox($wrapper);
-			$this->appendShowColumnCheckbox($wrapper);
 			
 			$order = $this->get('sortorder');
 			
+			$div = new XMLElement('div', NULL, array('class' => 'two columns'));
+
 			$label = Widget::Label();
+			$label->setAttribute('class', 'column');
 			$input = Widget::Input("fields[{$order}][force_sort]", 'yes', 'checkbox');
 			if($this->get('force_sort') == 'yes') $input->setAttribute('checked', 'checked');
 			$label->setValue(__('%s Disable sorting of other columns when enabled', array($input->generate())));
-			$wrapper->appendChild($label);
+			$div->appendChild($label);
 			
 			$label = Widget::Label();
+			$label->setAttribute('class', 'column');
 			$input = Widget::Input("fields[{$order}][hide]", 'yes', 'checkbox');
 			if ($this->get('hide') == 'yes') $input->setAttribute('checked', 'checked');
 			$label->setValue(__('%s Hide this field on publish page', array($input->generate())));
-			$wrapper->appendChild($label);
+			$div->appendChild($label);
 			
+			$this->appendShowColumnCheckbox($div);
+			$wrapper->appendChild($div);
 		}
 		
 		function commit(){
@@ -115,6 +119,7 @@
 				if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
 				else $wrapper->appendChild($label);
 			} else {
+				$wrapper->addClass('irrelevant');
 				$wrapper->appendChild($input);
 			}
 			
