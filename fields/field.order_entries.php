@@ -115,6 +115,7 @@
 				if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
 				else $wrapper->appendChild($label);
 			} else {
+				$wrapper->addClass('irrelevant');
 				$wrapper->appendChild($input);
 			}
 			
