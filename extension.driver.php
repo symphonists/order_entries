@@ -29,7 +29,7 @@
 				if ($section->getSortingOrder() !== 'asc' || !is_numeric($section->getSortingField())) return;
 				
 				$field = FieldManager::fetch($section->getSortingField());
-				if($field->get('type') !== 'order_entries') return;
+				if(!$field || $field->get('type') !== 'order_entries') return;
 				
 				Administration::instance()->Page->addElementToHead(
 					new XMLElement(
