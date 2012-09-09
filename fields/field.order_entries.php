@@ -38,7 +38,14 @@
 		function processRawFieldData($data, &$status, &$message=null, $simulate=false, $entry_id=null) {
 			$status = self::__OK__;
 			
-			Symphony::Database()->query("UPDATE tbl_entries_data_{$this->get('id')} SET value = (value + 1) WHERE value >= ".$data);
+			if($entry_id) {
+				$new_value = $data;
+				$current_value = Symphony::Database()->fetchVar("value", 0, "SELECT value FROM tbl_entries_data_{$this->get('id')} WHERE entry_id=".$entry_id." LIMIT 1");
+				if(isset($current_value) && $current_value !== $new_value) {
+					Symphony::Database()->query("UPDATE tbl_entries_data_{$this->get('id')} SET value = (value + 1) WHERE value >= ".$data);
+				}
+			}
+			
 			return array(
 				'value' => $data,
 			);
