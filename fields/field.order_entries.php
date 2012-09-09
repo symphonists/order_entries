@@ -35,8 +35,9 @@
 			return true;
 		}
 
-		function processRawFieldData($data, &$status, $simulate=false, $entry_id=null) {
-
+		function processRawFieldData($data, &$status, &$message=null, $simulate=false, $entry_id=null) {
+			$status = self::__OK__;
+			
 			Symphony::Database()->query("UPDATE tbl_entries_data_{$this->get('id')} SET value = (value + 1) WHERE value >= ".$data);
 			return array(
 				'value' => $data,
