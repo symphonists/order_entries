@@ -19,6 +19,8 @@
 					Symphony::Database()->query("DELETE FROM tbl_entries_data_$field_id WHERE `entry_id` = '$entry_id' AND `id` > '$id'");
 				}
 		    }
+
+			Symphony::ExtensionManager()->notifyMembers('EntriesPostOrder', '/publish/', array('entry_id' => array_keys($items)));
 			
 			exit;
 		}
