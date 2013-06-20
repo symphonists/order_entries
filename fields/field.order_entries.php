@@ -205,7 +205,11 @@
 		}
 		
 		public function prepareTableValue($data, XMLElement $link = null){
-			return sprintf('<span class="order">%d</span>', $data['value']);
+			if (!$link) {
+				return sprintf('<span class="order">%d</span>', $data['value']);
+			}
+			$link->setValue($data['value']);
+			return $link->generate();
 		}
 		
 		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null, $entry_id = null){
