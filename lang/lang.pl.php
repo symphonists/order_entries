@@ -30,7 +30,7 @@
 		'%s Wyłącz sortowanie innych kolumn gdy włączone',
 
 		'%s Hide this field on publish page' => 
-		'% Ukryj to pole na stronie publikowania',
+		'%s Ukryj to pole na stronie publikowania',
 
 		'To filter by ranges, add <code>%s</code> to the beginning of the filter input. Use <code>%s</code> for field name. E.G. <code>%s</code>' => 
 		'Aby filtrować po zakresach, dodaj <code>%s</code> na początku pola filtrowania. Użyj <code>%s</code> dla nazy pola. Np. <code>%s</code>',
