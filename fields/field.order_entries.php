@@ -177,7 +177,7 @@
 				  `entry_id` int(11) unsigned NOT NULL,
 				  `value` double default NULL,
 				  PRIMARY KEY  (`id`),
-				  KEY `entry_id` (`entry_id`),
+				  UNIQUE KEY `entry_id` (`entry_id`),
 				  KEY `value` (`value`)
 				) TYPE=MyISAM;"
 
