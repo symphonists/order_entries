@@ -8,7 +8,12 @@
 						'page' => '/backend/',
 						'delegate' => 'InitaliseAdminPageHead',
 						'callback' => 'appendScriptToHead'
-					)
+					),
+					array(
+                				'page'      => '/publish/',
+                				'delegate'  => 'AdjustPublishFiltering',
+                				'callback'  => 'changePagination'
+            				)
 			);
 		}
 		
@@ -47,10 +52,40 @@
 					time()
 				);
 				
-				Symphony::Configuration()->set("pagination_maximum_rows", 99999, "symphony");
-				
 			}
 			
+		}
+		
+		public function changePagination($context){
+
+			
+			$page_callback = Administration::instance()->getPageCallback();
+			$page_callback = $page_callback['context'];
+
+			$config = Symphony::Configuration();
+			
+			if(isset($page_callback['section_handle']) && $page_callback['page'] == 'index'){
+				
+				// find sort settings for this section (sort field ID and direction)
+				$section_id = SectionManager::fetchIDFromHandle($page_callback['section_handle']);
+				if(!$section_id) return;
+				
+				$section = SectionManager::fetch($section_id);
+				
+				// we only want a valid entry order field and ascending order only
+				if ($section->getSortingOrder() !== 'asc' || !is_numeric($section->getSortingField())) return;
+				
+				$field = FieldManager::fetch($section->getSortingField());
+				if(!$field || $field->get('type') !== 'order_entries') return;
+	        		     
+	            $count = Symphony::Database()->fetchVar('total', 0, 'SELECT COUNT(*) AS `total` FROM `tbl_entries` WHERE `section_id` = '.$section_id.';');
+
+	            //$config->remove('pagination_maximum_rows','symphony');
+	            //Set the pagination value to equal total entry count
+	            $config->set('pagination_maximum_rows',$count,'symphony');
+	            
+	        }
+
 		}
 		
 		public function uninstall(){
