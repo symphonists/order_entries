@@ -82,7 +82,9 @@
 
 	            //$config->remove('pagination_maximum_rows','symphony');
 	            //Set the pagination value to equal total entry count
-	            $config->set('pagination_maximum_rows',$count,'symphony');
+	            if(!is_null($count) && $count > 0){
+	            	$config->set('pagination_maximum_rows',$count,'symphony');
+	            }
 	            
 	        }
 
