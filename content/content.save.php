@@ -10,6 +10,8 @@
 			
 		    if(!is_array($items) || empty($items)) exit;
 
+			Symphony::ExtensionManager()->notifyMembers('EntryPreEdit', '/publish/edit/');
+
 			foreach($items as $entry_id => $position) {
 				$id = Symphony::Database()->fetchVar('id', 0, "SELECT id FROM tbl_entries_data_$field_id WHERE `entry_id` = '$entry_id' ORDER BY id ASC LIMIT 1");
 				if (is_null($id)) {
@@ -20,8 +22,8 @@
 				}
 		    }
 			
+			Symphony::ExtensionManager()->notifyMembers('EntryPostEdit', '/publish/edit/');
+
 			exit;
 		}
 	}
-	
-?>
