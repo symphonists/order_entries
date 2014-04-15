@@ -63,7 +63,7 @@
 			if($this->force_sort == 'yes') {
 				foreach($context['tableHead'] as $head) {
 					if($head[2]['class'] == 'field-order_entries') {
-						$head[0]->setAttribute('data-manual-sort', 'force');
+						$head[0]->setAttribute('data-manual-sorting', 'force');
 					}
 				}
 			}
