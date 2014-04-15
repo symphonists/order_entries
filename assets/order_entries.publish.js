@@ -8,14 +8,17 @@
 
 	Symphony.Extensions.OrderEntries = function() {
 		var table, tableHead,
-			fieldId, oldSorting, newSorting;
+			fieldHead, fieldId,
+			sortorder, oldSorting, newSorting;
 
 		var init = function() {
 			table = Symphony.Elements.contents.find('table');
 			tableHead = table.find('thead');
 
 			// Get sorting field id
-			fieldId = tableHead.find('th.field-order_entries').attr('id').split('-')[1];
+			fieldHead = tableHead.find('th.field-order_entries');
+			fieldId = fieldHead.attr('id').split('-')[1];
+			sortorder = (fieldHead.find('a').attr('href').indexOf('asc') > -1 ? 'desc' : 'asc');
 
 			// Add help
 			Symphony.Elements.breadcrumbs.append('<p class="inactive"><span>– ' + Symphony.Language.get('drag to reorder') + '</span></p>');
@@ -50,15 +53,21 @@
 			// Store sort order
 			if(oldSorting != newSorting) {
 				$.ajax({
-					type: 'POST',
+					type: 'GET',
 					url: Symphony.Context.get('symphony') + '/extension/order_entries/save/',
 					data: newSorting + '&field=' + fieldId + '&' + Symphony.Utilities.getXSRF(true),
 					success: function() {
 						oldSorting = newSorting;
 
 						// Update indexes
-						table.find('.order-entries-item').each(function(index) {
-							$(this).text(index + 1)
+						var items = table.find('.order-entries-item');
+						items.each(function(index) {
+							if(sortorder == 'asc') {
+								$(this).text(index + 1);
+							}
+							else {
+								$(this).text(items.length - index);
+							}
 						});
 					},
 					error: function() {
@@ -72,9 +81,19 @@
 		};
 
 		var getState = function() {
-			return table.find('input').map(function(e, i) {
-				return this.name + '=' + (e + 1);
+			var items = table.find('input'),
+				states;
+
+			states = items.map(function(index) {
+				if(sortorder == 'asc') {
+					return this.name + '=' + (index + 1);
+				}
+				else {
+					return this.name + '=' + (items.length - index);
+				}
 			}).get().join('&');
+
+			return states;
 		};
 
 		// API
