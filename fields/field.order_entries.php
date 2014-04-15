@@ -105,8 +105,13 @@
 				$input->setAttribute('checked', 'checked');
 			}
 
-			$label->setValue(__('%s Disable sorting of other columns when enabled', array($input->generate())));
+			$label->setValue(__('%s Force manual sorting', array($input->generate())));
 			$div->appendChild($label);
+			$wrapper->appendChild($div);
+
+			// Display options
+			$fieldset = new XMLElement('fieldset');
+			$div = new XMLElement('div', null, array('class' => 'two columns'));
 
 			$label = Widget::Label();
 			$label->setAttribute('class', 'column');
@@ -116,11 +121,12 @@
 				$input->setAttribute('checked', 'checked');
 			}
 
-			$label->setValue(__('%s Hide this field on publish page', array($input->generate())));
+			$label->setValue(__('%s Hide on publish page', array($input->generate())));
 			$div->appendChild($label);
 
 			$this->appendShowColumnCheckbox($div);
-			$wrapper->appendChild($div);
+			$fieldset->appendChild($div);
+			$wrapper->appendChild($fieldset);
 		}
 
 		function commit() {
