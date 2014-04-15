@@ -74,7 +74,7 @@
 		 */
 		public function addComponents() {
 			Administration::instance()->Page->addScriptToHead(
-				APPLICATION_URL . '/extensions/order_entries/assets/order_entries.publish.js'
+				URL . '/extensions/order_entries/assets/order_entries.publish.js'
 			);
 		}
 
