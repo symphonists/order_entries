@@ -61,9 +61,7 @@
 							$(this).text(index + 1)
 						});
 					},
-					error: function(a, b, c) {
-						console.log(a, b, c);
-
+					error: function() {
 						Symphony.Elements.header.find('div.notifier').trigger('attach.notify', [
 							Symphony.Language.get('An error occured while saving the new sort order. Please try again.'),
 							'reorder error'
