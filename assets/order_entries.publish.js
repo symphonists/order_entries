@@ -7,25 +7,19 @@
 	});
 
 	Symphony.Extensions.OrderEntries = function() {
-		var table, tableHead,
-			fieldHead, fieldId,
-			sortorder, oldSorting, newSorting;
+		var table, fieldId,	direction, oldSorting, newSorting;
 
 		var init = function() {
 			table = Symphony.Elements.contents.find('table');
-			tableHead = table.find('thead');
-
-			// Get sorting field id
-			fieldHead = tableHead.find('th.field-order_entries');
-			fieldId = fieldHead.attr('id').split('-')[1];
-			sortorder = (fieldHead.find('a').attr('href').indexOf('asc') > -1 ? 'desc' : 'asc');
+			fieldId = table.attr('data-order-entries-id');
+			direction = table.attr('data-order-entries-direction');
 
 			// Add help
 			Symphony.Elements.breadcrumbs.append('<p class="inactive"><span>– ' + Symphony.Language.get('drag to reorder') + '</span></p>');
 
 			// Force manual sorting
-			if(tableHead.has('[data-manual-sorting]').length) {
-				tableHead.find('th:not(.field-order_entries)').each(disableSortingModes);
+			if(table.is('[data-order-entries-force]')) {
+				table.find('th:not(.field-order_entries)').each(disableSortingModes);
 			}
 
 			// Enable sorting
@@ -62,7 +56,7 @@
 						// Update indexes
 						var items = table.find('.order-entries-item');
 						items.each(function(index) {
-							if(sortorder == 'asc') {
+							if(direction == 'asc') {
 								$(this).text(index + 1);
 							}
 							else {
@@ -85,7 +79,7 @@
 				states;
 
 			states = items.map(function(index) {
-				if(sortorder == 'asc') {
+				if(direction == 'asc') {
 					return this.name + '=' + (index + 1);
 				}
 				else {

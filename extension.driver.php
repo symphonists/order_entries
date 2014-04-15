@@ -2,8 +2,10 @@
 
 	Class extension_order_entries extends Extension {
 
-		private $force_sort = false;
 		private $pagination_maximum_rows = null;
+		private $force_sort = false;
+		private $field_id = 0;
+		private $direction = 'asc';
 		
 		/**
 		 * {@inheritDoc}
@@ -16,8 +18,8 @@
 					'callback' => 'prepareIndex'
 				),
 				array(
-					'page' => '/publish/',
-					'delegate' => 'AddCustomPublishColumn',
+					'page' => '/backend/',
+					'delegate' => 'AdminPagePreGenerate',
 					'callback' => 'adjustTable'
 				),
 				array(
@@ -47,6 +49,8 @@
 					// Check sorting field
 					if($field->get('type') == 'order_entries') {
 						$this->force_sort = $field->get('force_sort');
+						$this->field_id = $field->get('id');
+						$this->direction = $section->getSortingOrder();
 					
 						// Initialise manual ordering
 						$this->addComponents();
@@ -60,11 +64,15 @@
 		 * Force manual sorting
 		 */
 		public function adjustTable($context) {
-			if($this->force_sort == 'yes') {
-				foreach($context['tableHead'] as $head) {
-					if($head[2]['class'] == 'field-order_entries') {
-						$head[0]->setAttribute('data-manual-sorting', 'force');
-					}
+			$callback = Symphony::Engine()->getPageCallback();
+
+			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
+				$table = $context['oPage']->Contents->getChildren()[0]->getChildrenByName('table')[1];
+				$table->setAttribute('data-order-entries-id', $this->field_id);
+				$table->setAttribute('data-order-entries-direction', $this->direction);
+
+				if($this->force_sort == 'yes') {
+					$table->setAttribute('data-order-entries-force', 'true');
 				}
 			}
 		}
