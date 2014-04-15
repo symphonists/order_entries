@@ -230,7 +230,7 @@
 
 		public function prepareTableValue($data, XMLElement $link = null) {
 			if(!$link) {
-				return sprintf('<span class="order">%d</span>', $data['value']);
+				return sprintf('<span class="order-entries-item">%d</span>', $data['value']);
 			}
 			else {
 				$link->setValue($data['value']);
