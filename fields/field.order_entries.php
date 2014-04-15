@@ -145,6 +145,12 @@
 			$fields['force_sort'] = $this->get('force_sort');
 			$fields['hide'] = $this->get('hide');
 
+			// Update section's sorting field
+			if($this->get('force_sort') == 'yes') {
+				$section = SectionManager::fetch($this->get('parent_section'));
+				$section->setSortingField($id);
+			}
+
 			Symphony::Database()->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
 			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
 		}
