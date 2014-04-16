@@ -13,6 +13,17 @@
 				$this->generate();
 			};
 
+			/**
+			 * Just prior to reordering entries
+			 *
+			 * @delegate EntryPreOrder
+			 * @param string $context
+			 * '/publish/'
+			 * @param number $field_id
+			 * @param array $items
+			 */
+			Symphony::ExtensionManager()->notifyMembers('EntriesPreOrder', '/publish/', array('field_id' => $field_id, 'items' => &$items));
+
 			foreach($items as $entry_id => $position) {
 				$id = Symphony::Database()->fetchVar('id', 0, "
 					SELECT id
@@ -40,6 +51,16 @@
 					");
 				}
 		    }
+
+		    /**
+			 * After reordering entries
+			 *
+			 * @delegate EntryPostOrder
+			 * @param string $context
+			 * '/publish/'
+			 * @param array $entry_id
+			 */
+			Symphony::ExtensionManager()->notifyMembers('EntriesPostOrder', '/publish/', array('entry_id' => array_keys($items)));
 	
 			$this->_Result['success'] = __('Sorting complete');
 		}
