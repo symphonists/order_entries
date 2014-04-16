@@ -47,7 +47,7 @@
 					$field = FieldManager::fetch($section->getSortingField());
 
 					// Check sorting field
-					if($field->get('type') == 'order_entries') {
+					if($field && $field->get('type') == 'order_entries') {
 						$this->force_sort = $field->get('force_sort');
 						$this->field_id = $field->get('id');
 						$this->direction = $section->getSortingOrder();
