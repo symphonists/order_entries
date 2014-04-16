@@ -17,7 +17,11 @@
 		</author>
 	</authors>
 	<releases>
-		<release version="2.0" date="2014-04-15" min="2.4">
+		<release version="2.0.1" date="2014-04-16" min="2.4">
+			- Minor fixes
+			- Added custom delegated pre and post ordering
+		</release>
+		<release version="2.0.0" date="2014-04-15" min="2.4">
 			- Symphony 2.4 compatibility
 			- Fix pagination maximum rows
 			- Force sort now automatically sets sorting
