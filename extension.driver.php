@@ -67,7 +67,9 @@
 			$callback = Symphony::Engine()->getPageCallback();
 
 			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
-				$table = $context['oPage']->Contents->getChildren()[0]->getChildrenByName('table')[1];
+				$contents = $context['oPage']->Contents->getChildren();
+				$form = $contents[0]->getChildrenByName('table');
+				$table = $form[1];
 				$table->setAttribute('data-order-entries-id', $this->field_id);
 				$table->setAttribute('data-order-entries-direction', $this->direction);
 
