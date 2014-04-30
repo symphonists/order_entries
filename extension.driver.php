@@ -69,12 +69,15 @@
 			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
 				$contents = $context['oPage']->Contents->getChildren();
 				$form = $contents[0]->getChildrenByName('table');
-				$table = $form[1];
-				$table->setAttribute('data-order-entries-id', $this->field_id);
-				$table->setAttribute('data-order-entries-direction', $this->direction);
+				$table = $form[0];
 
-				if($this->force_sort == 'yes') {
-					$table->setAttribute('data-order-entries-force', 'true');
+				if(!empty($table)) {
+					$table->setAttribute('data-order-entries-id', $this->field_id);
+					$table->setAttribute('data-order-entries-direction', $this->direction);
+
+					if($this->force_sort == 'yes') {
+						$table->setAttribute('data-order-entries-force', 'true');
+					}
 				}
 			}
 		}
