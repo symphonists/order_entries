@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <extension id="order_entries" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
-	
 	<name>Order Entries</name>
-
 	<description lang="en">Allow drag-and-drop re-ordering of entries.</description>
-
 	<repo type="github">https://github.com/symphonists/order_entries</repo>
-	
 	<types>
 		<type>Workflow</type>
 		<type>Field</type>
 	</types>
-	
 	<authors>
 		<author>
 			<name github="symphonists" symphony="community">Symphony Community</name>
@@ -21,16 +16,21 @@
 			<website>http://nick-dunn.co.uk</website>
 		</author>
 	</authors>
-	
 	<releases>
+		<release version="2.0.1" date="2014-04-16" min="2.4">
+			- Minor fixes
+			- Added custom delegated pre and post ordering
+		</release>
+		<release version="2.0.0" date="2014-04-15" min="2.4">
+			- Symphony 2.4 compatibility
+			- Fix pagination maximum rows
+			- Force sort now automatically sets sorting
+		</release>
 		<release version="1.10.1" date="2012-03-11" min="2.3.x" />
 		<release version="1.10.0" date="2012-03-09" min="2.3.x" />
-		<release version="1.9.8" date="2011-12-19" min="2.2.2" max="2.2.x">
-			* Added `appendFormattedElement` and `getParameterPoolValue` methods to prevent bad default output (thanks DavidOliver!)
-		</release>
+		<release version="1.9.8" date="2011-12-19" min="2.2.2" max="2.2.x" />
 		<release version="1.9.7" date="2011-10-12" min="2.2.2" />
 		<release version="1.9.6" date="2011-02-16" min="2.2" />
 		<release version="1.9.5" date="2011-05-21" min="2.0.3" max="2.1.x" />
-	</releases>	
-		
+	</releases>
 </extension>

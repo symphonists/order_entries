@@ -1,106 +1,103 @@
-Symphony.Language.add({
-	'drag to reorder': false,
-	'Reordering was unsuccessful.': false,
-	'Entry order saved.': false
-});
+(function($, Symphony) {
+	'use strict';
 
-OrderEntries = {
-	
-	table: null,
-	config: null,
-	h2: null,
-	column_index: null,
-	
-	init: function() {
-		var self = this;
-		
-		this.table = jQuery('#contents > form > table');
-		if(!this.table.find('tbody tr').length) return;
-		
-		this.config = Symphony.Context.get('order-entries');
-		
-		jQuery('#breadcrumbs').append('<p class="inactive"><span>(' + Symphony.Language.get('drag to reorder') + ')</span></p>');
-		this.column_index = this.table.find('thead th a.active[href*="sort=' + this.config.id + '&"]').parent().prevAll().length;
-		
-		// disable sorting of other columns by removing the anchors
-		if(this.config['force-sort'] == 'yes') {
-			this.table.find('thead th').each(function() {
-				// don't touch the order entries field, leave sortable
-				if(jQuery(this).find('a[href*="sort=' + self.config.id + '&"]').length) return;
-				// get the plain text of the cell
-				var text = jQuery(this).text();
-				// replace contents with plain text
-				jQuery(this).html(text);
+	Symphony.Language.add({
+		'drag to reorder': false,
+		'An error occured while saving the new sort order. Please try again.': false
+	});
+
+	Symphony.Extensions.OrderEntries = function() {
+		var table, fieldId,	direction, oldSorting, newSorting;
+
+		var init = function() {
+			table = Symphony.Elements.contents.find('table');
+			fieldId = table.attr('data-order-entries-id');
+			direction = table.attr('data-order-entries-direction');
+
+			// Add help
+			Symphony.Elements.breadcrumbs.append('<p class="inactive"><span>– ' + Symphony.Language.get('drag to reorder') + '</span></p>');
+
+			// Force manual sorting
+			if(table.is('[data-order-entries-force]')) {
+				table.find('th:not(.field-order_entries)').each(disableSortingModes);
+			}
+
+			// Enable sorting
+			table.symphonyOrderable({
+				items: 'tr',
+				handles: 'td'
 			});
-		}
-		
-		// Orderable tables
-		this.table.symphonyOrderable({
-			items: 'tr',
-			handles: 'td'
-		});
 
-		// Don't start ordering while clicking on links
-		this.table.find('a').mousedown(function(event) {
-			event.stopPropagation();
-		});
-		
-		// unbind any previous ordering (Symphony's default callbacks)
-		this.table.unbind('orderstart');
-		this.table.unbind('orderstop');
+			// Process sort order
+			oldSorting = getState();
+			table.on('orderstop.orderable', processState);
+		};
 
-		// Store current sort order
-		this.table.on('orderstart.orderable', function() {
-			old_sorting = self.table.find('input').map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&');
-		});
+		var disableSortingModes = function() {
+			var header = $(this),
+				text = header.text();
 
-		// Process sort order
-		this.table.on('orderstop.orderable', function() {
-			self.table.addClass('busy');
+			// Remove sorting links
+			header.html(text);
+		};
 
-			// Get new sort order
-			var new_sorting = self.table.find('input').map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&');
+		var processState = function() {
+			newSorting = getState();
 
-			// Store new sort order
-			if(new_sorting != old_sorting) {
-
-				// Update items
-				self.table.trigger('orderchange');
-
-				// Send request
-				jQuery.ajax({
-					type: 'POST',
-					url: Symphony.Context.get('root') + '/symphony/extension/order_entries/save/',
-					data: jQuery('input', this).map(function(e, i) { return this.name + '=' + (e + 1); }).get().join('&') + '&field=' + self.config.id,
+			// Store sort order
+			if(oldSorting != newSorting) {
+				$.ajax({
+					type: 'GET',
+					url: Symphony.Context.get('symphony') + '/extension/order_entries/save/',
+					data: newSorting + '&field=' + fieldId + '&' + Symphony.Utilities.getXSRF(true),
 					success: function() {
-						// Symphony.Message.clear('reorder');
-						// Symphony.Message.post(Symphony.Language.get('Entry order saved.'), 'reorder success');
+						oldSorting = newSorting;
+
+						// Update indexes
+						var items = table.find('.order-entries-item');
+						items.each(function(index) {
+							if(direction == 'asc') {
+								$(this).text(index + 1);
+							}
+							else {
+								$(this).text(items.length - index);
+							}
+						});
 					},
 					error: function() {
-						//Symphony.Message.post(Symphony.Language.get('Reordering was unsuccessful.'), 'reorder error');
-					},
-					complete: function() {
-						self.table.removeClass('busy').find('tr').removeClass('selected');
-						old_sorting = null;
-						
-	                    // find the Order Field column index
-	                    self.table.find('tbody tr td:nth-child(' + (self.column_index + 1) + ')').each(function(i, element) {
-							jQuery(this).find('.order').text(i + 1);
-	                    });
-						
+						Symphony.Elements.header.find('div.notifier').trigger('attach.notify', [
+							Symphony.Language.get('An error occured while saving the new sort order. Please try again.'),
+							'reorder error'
+						]);
 					}
 				});
 			}
-			else {
-				self.table.removeClass('busy');
-			}
+		};
 
-		});
-		
-	}
-	
-};
+		var getState = function() {
+			var items = table.find('input'),
+				states;
 
-jQuery(document).ready(function() {
-	OrderEntries.init();
-});
+			states = items.map(function(index) {
+				if(direction == 'asc') {
+					return this.name + '=' + (index + 1);
+				}
+				else {
+					return this.name + '=' + (items.length - index);
+				}
+			}).get().join('&');
+
+			return states;
+		};
+
+		// API
+		return {
+			init: init
+		};
+	}();
+
+	$(document).on('ready.orderentries', function() {
+		Symphony.Extensions.OrderEntries.init();
+	});
+
+})(window.jQuery, window.Symphony);
