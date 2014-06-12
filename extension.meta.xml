@@ -17,6 +17,9 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.1.0" date="2014-06-12" min="2.4">
+			- Fix incorrect version number
+		</release>
 		<release version="2.0.1" date="2014-04-16" min="2.4">
 			- Minor fixes
 			- Added custom delegated pre and post ordering
