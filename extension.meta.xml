@@ -17,8 +17,10 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.1.1" date="2014-06-20" min="2.4">
+			- Fixed table selection
 		<release version="2.1.0" date="2014-06-12" min="2.4">
-			- Fix incorrect version number
+			- Fixed incorrect version number
 		</release>
 		<release version="2.0.1" date="2014-04-16" min="2.4">
 			- Minor fixes
@@ -26,8 +28,8 @@
 		</release>
 		<release version="2.0.0" date="2014-04-15" min="2.4">
 			- Symphony 2.4 compatibility
-			- Fix pagination maximum rows
-			- Force sort now automatically sets sorting
+			- Fixed pagination maximum rows
+			- Fixed force sort that now automatically sets sorting
 		</release>
 		<release version="1.10.1" date="2012-03-11" min="2.3.x" />
 		<release version="1.10.0" date="2012-03-09" min="2.3.x" />
