@@ -68,15 +68,22 @@
 
 			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
 				$contents = $context['oPage']->Contents->getChildren();
-				$form = $contents[0]->getChildrenByName('table');
-				$table = $form[0];
+				
+				// check every child, since the
+				// form may not always be the first element
+				foreach ($contents as $child) {
+					$form = $child->getChildrenByName('table');
+					$table = $form[0];
 
-				if(!empty($table)) {
-					$table->setAttribute('data-order-entries-id', $this->field_id);
-					$table->setAttribute('data-order-entries-direction', $this->direction);
+					if(!empty($table)) {
+						$table->setAttribute('data-order-entries-id', $this->field_id);
+						$table->setAttribute('data-order-entries-direction', $this->direction);
 
-					if($this->force_sort == 'yes') {
-						$table->setAttribute('data-order-entries-force', 'true');
+						if($this->force_sort == 'yes') {
+							$table->setAttribute('data-order-entries-force', 'true');
+						}
+						
+						break;
 					}
 				}
 			}
