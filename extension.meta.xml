@@ -17,6 +17,9 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.1.2" date="2014-06-21" min="2.4">
+			- Fixed invalid meta XML
+		</release>
 		<release version="2.1.1" date="2014-06-20" min="2.4">
 			- Fixed table selection
 		</release>
