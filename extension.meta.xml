@@ -19,6 +19,7 @@
 	<releases>
 		<release version="2.1.1" date="2014-06-20" min="2.4">
 			- Fixed table selection
+		</release>
 		<release version="2.1.0" date="2014-06-12" min="2.4">
 			- Fixed incorrect version number
 		</release>
