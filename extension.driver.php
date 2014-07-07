@@ -64,6 +64,9 @@
 		 * Force manual sorting
 		 */
 		public function adjustTable($context) {
+			if (!Symphony::Engine()->isLoggedIn()) {
+				return;
+			}
 			$callback = Symphony::Engine()->getPageCallback();
 
 			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
