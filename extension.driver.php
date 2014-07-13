@@ -64,6 +64,9 @@
 		 * Force manual sorting
 		 */
 		public function adjustTable($context) {
+			if (!Symphony::Engine()->isLoggedIn()) {
+				return;
+			}
 			$callback = Symphony::Engine()->getPageCallback();
 
 			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
@@ -73,7 +76,8 @@
 				// form may not always be the first element
 				foreach ($contents as $child) {
 					$form = $child->getChildrenByName('table');
-					$table = $form[0];
+					// use current here since the keys can change somehow
+					$table = current($form);
 
 					if(!empty($table)) {
 						$table->setAttribute('data-order-entries-id', $this->field_id);
