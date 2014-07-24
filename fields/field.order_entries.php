@@ -14,6 +14,7 @@
 			$this->_required = false;
 
 			$this->set('hide', 'no');
+			$this->set('location', 'sidebar');
 		}
 
 		function isSortable() {
