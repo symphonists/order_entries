@@ -4,8 +4,8 @@
 		'name' => 'Finnish',
 		'author' => array(
 			'name' => 'Leo Nikkilä',
-			'email' => 'leo.nikkila@gmail.com',
-			'website' => ''
+			'email' => 'hello@lnikki.la',
+			'website' => 'https://lnikki.la'
 		),
 		'release-date' => '2013-06-22'
 	);
@@ -19,16 +19,15 @@
 		'Järjestys tallennettu.',
 
 		'Entry Order' => 
-		'Merkintöjen järjestäminen',
+		'Merkintöjen järjestys',
 		
 		'%s Disable sorting of other columns when enabled' => 
-		'%s Estä muiden sarakkeiden perusteella järjestäminen 
-kun kytketty päälle',
+		'%s Estä muiden sarakkeiden perusteella järjestäminen',
 
 		'%s Hide this field on publish page' => 
 		'%s Piilota tämä kenttä muokkaussivulla',
 		
 		'drag to reorder' =>
-		'vedä ja pudota järjestääksesi uudelleen'
+		'järjestä uudelleen raahaamalla rivejä'
 		
 	);
