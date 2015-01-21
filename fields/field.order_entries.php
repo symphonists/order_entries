@@ -107,6 +107,17 @@
 
 			$label->setValue(__('%s Force manual sorting', array($input->generate())));
 			$div->appendChild($label);
+
+			$label = Widget::Label();
+			$label->setAttribute('class', 'column');
+			$input = Widget::Input("fields[{$order}][disable_pagination]", 'yes', 'checkbox');
+
+			if($this->get('disable_pagination') == 'yes') {
+				$input->setAttribute('checked', 'checked');
+			}
+
+			$label->setValue(__('%s Disable Pagination', array($input->generate())));
+			$div->appendChild($label);
 			$wrapper->appendChild($div);
 
 			// Display options
@@ -143,6 +154,7 @@
 
 			$fields['field_id'] = $id;
 			$fields['force_sort'] = $this->get('force_sort');
+			$fields['disable_pagination'] = $this->get('disable_pagination');
 			$fields['hide'] = $this->get('hide');
 
 			// Update section's sorting field

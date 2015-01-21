@@ -7,7 +7,7 @@
 	});
 
 	Symphony.Extensions.OrderEntries = function() {
-		var table, fieldId,	direction, oldSorting, newSorting;
+		var table, fieldId,	direction, oldSorting, newSorting, startValue;
 
 		var init = function() {
 			table = Symphony.Elements.contents.find('table');
@@ -30,6 +30,11 @@
 
 			// Process sort order
 			oldSorting = getState();
+			startValue = parseInt(table.find('.order-entries-item').eq(0).text());
+			var assumedStartValue = Symphony.Pagination['max-rows'] * (Symphony.Pagination['current'] - 1) + 1;
+			if (startValue == 0 || direction == 'asc' && startValue < assumedStartValue) {
+				startValue = assumedStartValue;
+			}
 			table.on('orderstop.orderable', processState);
 		};
 
@@ -57,10 +62,12 @@
 						var items = table.find('.order-entries-item');
 						items.each(function(index) {
 							if(direction == 'asc') {
-								$(this).text(index + 1);
+								$(this).text(index + startValue);
 							}
 							else {
-								$(this).text(items.length - index);
+								var largest = startValue;
+								if ( items.length > largest ) largest = items.length;
+								$(this).text(largest - index);
 							}
 						});
 					},
@@ -80,10 +87,12 @@
 
 			states = items.map(function(index) {
 				if(direction == 'asc') {
-					return this.name + '=' + (index + 1);
+					return this.name + '=' + (index + startValue);
 				}
 				else {
-					return this.name + '=' + (items.length - index);
+					var largest = startValue;
+					if ( items.length > largest ) largest = items.length;
+					return this.name + '=' + (largest - index);
 				}
 			}).get().join('&');
 

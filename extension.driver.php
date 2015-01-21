@@ -54,7 +54,9 @@
 					
 						// Initialise manual ordering
 						$this->addComponents();
-						$this->disablePagination();
+						if ($field->get('disable_pagination') == 'yes'){
+							$this->disablePagination();
+						}
 					}
 				}
 			}
@@ -97,6 +99,19 @@
 		 * Add components for manual entry ordering
 		 */
 		public function addComponents() {
+
+			$pagination = array(
+				'max-rows' => Symphony::Configuration()->get('pagination_maximum_rows', 'symphony'),
+				'current' => (isset($_REQUEST['pg']) && is_numeric($_REQUEST['pg']) ? max(1, intval($_REQUEST['pg'])) : 1)
+				// 'total' => $pgmax
+			);
+
+			Administration::instance()->Page->addElementToHead(
+				new XMLElement('script', 'Symphony.Pagination='.json_encode($pagination), array(
+					'type' => 'text/javascript'
+				))				
+			);
+
 			Administration::instance()->Page->addScriptToHead(
 				URL . '/extensions/order_entries/assets/order_entries.publish.js'
 			);
@@ -147,6 +162,15 @@
 					ALTER TABLE `tbl_fields_order_entries`
 					ADD `hide` enum('yes','no')
 					DEFAULT 'no'
+				");
+			}
+
+			// Prior version 2.1.4
+			if(version_compare($previousVersion, '2.1.4', '<')) {
+				$status[] = Symphony::Database()->query("
+					ALTER TABLE `tbl_fields_order_entries`
+					ADD `disable_pagination` enum('yes','no')
+					DEFAULT 'yes'
 				");
 			}
 
