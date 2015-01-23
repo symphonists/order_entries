@@ -7,12 +7,21 @@
 	});
 
 	Symphony.Extensions.OrderEntries = function() {
-		var table, fieldId,	direction, oldSorting, newSorting, startValue;
+		var table, fieldId,	direction, oldSorting, newSorting, startValue, filters;
 
 		var init = function() {
 			table = Symphony.Elements.contents.find('table');
 			fieldId = table.attr('data-order-entries-id');
 			direction = table.attr('data-order-entries-direction');
+			filters = Symphony.Context.get('env').filters;
+
+			// convert filters into a query string
+			if (typeof(filters)!== 'undefined'){
+				filters = {"filters":filters};
+				filters = '&' + $.param(filters)
+			} else {
+				filters = '';
+			}
 
 			// Add help
 			Symphony.Elements.breadcrumbs.append('<p class="inactive"><span>– ' + Symphony.Language.get('drag to reorder') + '</span></p>');
@@ -54,11 +63,11 @@
 				$.ajax({
 					type: 'GET',
 					url: Symphony.Context.get('symphony') + '/extension/order_entries/save/',
-					data: newSorting + '&field=' + fieldId + '&' + Symphony.Utilities.getXSRF(true),
+					data: newSorting + '&field=' + fieldId + filters + '&' + Symphony.Utilities.getXSRF(true),
 					success: function() {
 						oldSorting = newSorting;
 
-						// Update indexes
+					// Update indexes
 						var items = table.find('.order-entries-item');
 						items.each(function(index) {
 							if(direction == 'asc') {
