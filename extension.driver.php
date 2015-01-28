@@ -66,6 +66,7 @@
 
 			} else {
 				$filters = $this->dsFilters;
+				if (empty($filters)) return array();
 
 				// check if the filters are used for entry ordering otherwise remove from list
 				foreach ($filters as $filtered_field_id => $value) {

@@ -256,7 +256,7 @@
 		}
 
 		function displayPublishPanel(&$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null) {
-			$value = $data['value'];
+			$value = $this->getOrderValue($data);
 
 			$label = Widget::Label($this->get('label'));
 			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
@@ -405,7 +405,12 @@
 
 				foreach ($filterableFields as $filtered_field_id) {
 					$filter = $filters[$filtered_field_id];
-					$matchingKeys = array_search($filter, $data['field_' . $filtered_field_id]);
+
+					if (isset($data['field_' . $filtered_field_id])){
+						$matchingKeys = array_search($filter, $data['field_' . $filtered_field_id]);
+					} else {
+						$matchingKeys = array();
+					}
 
 					if (empty($matchingKeys) && !is_int($matchingKeys)){
 						$matchingKeys = array();

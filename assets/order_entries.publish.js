@@ -16,7 +16,7 @@
 			filters = Symphony.Context.get('env').filters;
 
 			// convert filters into a query string
-			if (typeof(filters)!== 'undefined'){
+			if (filters){
 				filters = {"filters":filters};
 				filters = '&' + $.param(filters)
 			} else {
