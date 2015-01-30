@@ -28,4 +28,13 @@ However if you are sorting `4`, `6` and `12` sorting would give the following in
 
 Note that if you plan to use the sorting values only within the filtered views, and use that within your data sources this change will not impact your workflow.
 
-Expect some further changes in the near future in regards to filtered views and support of multiple sort values for different filters.
+## Filtered Ordering
+
+Order Entries now supports an option to filter entries and order them separately.
+To activate this functionality you have to select which fields you would like to use for filtering from within the settings panel.
+Once saved, filtered views will have separate orders depending on your settings.
+
+It is very important to note that with version 2.2 the "Filter value" used within the publish page matches whatever you put in your datasource.
+Sorting and order values are determined from the matching datasource parameter.
+If in the publish page was filtered by "Home" and your datasource filter says "home" the datasource ordering outputs will not match.
+An update to tackle this more comprehensively will be released shortly.
