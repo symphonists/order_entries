@@ -59,7 +59,8 @@
 				foreach ($filters as $field_name => $value) {
 					$filtered_field_id = FieldManager::fetchFieldIDFromElementName($field_name,$section_id);
 					if (in_array($filtered_field_id, $filterableFields)){
-						$filters[$filtered_field_id] = $value;
+						//ensuring that capitalization will never be an issue
+						$filters[$filtered_field_id] = strtolower($value);
 					}
 					unset($filters[$field_name]);
 				}

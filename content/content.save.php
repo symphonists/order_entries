@@ -31,8 +31,7 @@
 				foreach ($filters as $field_name => $value) {
 					$filtered_field_id = FieldManager::fetchFieldIDFromElementName($field_name,$section_id);
 					if (in_array($filtered_field_id, $filterableFields)){
-						$filters[$filtered_field_id] = General::sanitize($value);
-
+						$filters[$filtered_field_id] = strtolower(General::sanitize($value));
 					}
 					unset($filters[$field_name]);
 				}

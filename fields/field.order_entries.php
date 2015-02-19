@@ -235,12 +235,16 @@
 				return false;
 			}
 
+			$filteredFields = $this->get('filtered_fields');
+			if (!isset($filteredFields))
+				$filteredFields = array();
+
 			$fields = array();
 
 			$fields['field_id'] = $id;
 			$fields['force_sort'] = $this->get('force_sort');
 			$fields['disable_pagination'] = $this->get('disable_pagination');
-			$fields['filtered_fields'] = implode(',', $this->get('filtered_fields'));
+			$fields['filtered_fields'] = implode(',', $filteredFields);
 			$fields['hide'] = $this->get('hide');
 
 			// Update section's sorting field
