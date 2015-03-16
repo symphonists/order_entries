@@ -58,7 +58,7 @@
 				$increment_subsequent_order = true;
 			}
 
-			if($increment_subsequent_order) {
+			if($increment_subsequent_order && !empty($data)) {
 				Symphony::Database()->query("UPDATE tbl_entries_data_{$this->get('id')} SET value = (value + 1) WHERE value >= ".$data);
 			}
 
