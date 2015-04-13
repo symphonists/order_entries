@@ -40,7 +40,26 @@
 			$status = self::__OK__;
 			$increment_subsequent_order = false;
 
+			$filters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$this->get('id')} WHERE Field like 'field_%';");
+			// for now if there are any filters completely ignore any override.
+			if (!empty($filters)){
+				$filterString = implode(',', $filters);
+				$current_values = Symphony::Database()->fetch("
+					SELECT value, {$filterString}
+					FROM tbl_entries_data_{$this->get('id')}
+					WHERE entry_id=".$entry_id."
+				");
+				$result= array();
+				foreach ($current_values as $key => $row) {
+					foreach ($row as $col => $value) {
+						$result[$col][$key] = $value;
+					}
+				}
+				return $result;
+			}
+
 			if($entry_id) {
+
 				$new_value = $data;
 				$current_value = Symphony::Database()->fetchVar("value", 0, "
 					SELECT value

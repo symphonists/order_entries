@@ -161,7 +161,7 @@
 			Administration::instance()->Page->addElementToHead(
 				new XMLElement('script', 'Symphony.Pagination='.json_encode($pagination), array(
 					'type' => 'text/javascript'
-				))				
+				))
 			);
 
 			Administration::instance()->Page->addScriptToHead(
