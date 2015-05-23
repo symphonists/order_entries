@@ -39,8 +39,8 @@
 
 			// Process sort order
 			oldSorting = getState();
-			startValue = parseInt(table.find('.order-entries-item').eq(0).text());
-			var assumedStartValue = Symphony.Pagination['max-rows'] * (Symphony.Pagination['current'] - 1) + 1;
+			startValue = parseInt(table.find('.order-entries-item').eq(0).text(),10);
+			var assumedStartValue = Symphony.Context.get('env').pagination['max-rows'] * (Symphony.Context.get('env').pagination['current'] - 1) + 1;
 			if (startValue == 0 || direction == 'asc' && startValue < assumedStartValue) {
 				startValue = assumedStartValue;
 			}

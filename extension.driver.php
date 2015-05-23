@@ -152,16 +152,32 @@
 		 */
 		public function addComponents() {
 
+			// get pagination data
 			$pagination = array(
 				'max-rows' => Symphony::Configuration()->get('pagination_maximum_rows', 'symphony'),
 				'current' => (isset($_REQUEST['pg']) && is_numeric($_REQUEST['pg']) ? max(1, intval($_REQUEST['pg'])) : 1)
-				// 'total' => $pgmax
 			);
 
+
+			// get filter data
+			$filters = $_REQUEST['filter'];
+			if (is_array($filters)){
+				$generatedFilters = array();
+				foreach ($filters as $field => $value) {
+					$generatedFilters[$field] = $value;
+				}
+			}
+
+			// add pagination and filter data into symphony context if Symphony does not provide it
 			Administration::instance()->Page->addElementToHead(
-				new XMLElement('script', 'Symphony.Pagination='.json_encode($pagination), array(
-					'type' => 'text/javascript'
-				))
+				new XMLElement(
+					'script', 
+					'if (! Symphony.Context.get(\'env\').pagination) Symphony.Context.get(\'env\').pagination='.json_encode($pagination).';' .
+					'if (! Symphony.Context.get(\'env\').filters) Symphony.Context.get(\'env\').filters='.json_encode($generatedFilters).';'
+					, array(
+						'type' => 'text/javascript'
+					)
+				)
 			);
 
 			Administration::instance()->Page->addScriptToHead(
