@@ -18,6 +18,9 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.2.1" date="2015-01-26" min="2.5" max='2.6.x'>
+			- Fix entry selection
+		</release>
 		<release version="2.2.0" date="2015-01-22" min="2.5" max='2.6.x'>
 			- Add contextual Ordering using backend/frontend filters
 		</release>

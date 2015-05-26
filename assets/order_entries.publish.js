@@ -91,7 +91,7 @@
 		};
 
 		var getState = function() {
-			var items = table.find('input'),
+			var items = table.find('input[id^="entry"]'),
 				states;
 
 			states = items.map(function(index) {
