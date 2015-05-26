@@ -6,6 +6,7 @@
 		private $force_sort = false;
 		private $field_id = 0;
 		private $direction = 'asc';
+		private $dsFilters;
 		
 		/**
 		 * {@inheritDoc}
@@ -26,10 +27,61 @@
 					'page' => '/backend/',
 					'delegate' => 'AdminPagePostGenerate',
 					'callback' => 'resetPagination'
+				),
+				array(
+					'page' => '/frontend/',
+					'delegate' => 'DataSourcePreExecute',
+					'callback' => 'saveFilterContext'
 				)
 			);
 		}
 		
+		/**
+		 * Save the Datasource Filter Context so it can be used for ordering
+		 */
+		public function saveFilterContext($context) {
+			$this->dsFilters = $context['datasource']->dsParamFILTERS;
+		}
+
+		/**
+		 * get filters using filterable field ids and the section denoting where the filters are
+		 */
+		public function getFilters($filterableFields,$section_id){
+			//if no need to filter return empty filters
+			if (empty($filterableFields)) return array();
+
+			if (isset(Symphony::Engine()->Page)){
+				$context = Symphony::Engine()->Page->getContext();
+				$filters = $context['filters'];
+				if (!isset($filters)) $filters = array();
+
+				// check if the filters are used for entry ordering and switch from name to id
+				foreach ($filters as $field_name => $value) {
+					$filtered_field_id = FieldManager::fetchFieldIDFromElementName($field_name,$section_id);
+					if (in_array($filtered_field_id, $filterableFields)){
+						//ensuring that capitalization will never be an issue
+						$filters[$filtered_field_id] = strtolower($value);
+					}
+					unset($filters[$field_name]);
+				}
+
+			} else {
+				$filters = $this->dsFilters;
+				if (empty($filters)) return array();
+
+				// check if the filters are used for entry ordering otherwise remove from list
+				foreach ($filters as $filtered_field_id => $value) {
+					if (!in_array($filtered_field_id, $filterableFields)){
+						unset($filters[$filtered_field_id]);
+					}
+				}
+
+			}
+
+			return $filters;
+		}
+
+
 		/**
 		 * Prepare publish index for manual entry ordering
 		 */
@@ -54,7 +106,9 @@
 					
 						// Initialise manual ordering
 						$this->addComponents();
-						$this->disablePagination();
+						if ($field->get('disable_pagination') == 'yes'){
+							$this->disablePagination();
+						}
 					}
 				}
 			}
@@ -97,6 +151,35 @@
 		 * Add components for manual entry ordering
 		 */
 		public function addComponents() {
+
+			// get pagination data
+			$pagination = array(
+				'max-rows' => Symphony::Configuration()->get('pagination_maximum_rows', 'symphony'),
+				'current' => (isset($_REQUEST['pg']) && is_numeric($_REQUEST['pg']) ? max(1, intval($_REQUEST['pg'])) : 1)
+			);
+
+
+			// get filter data
+			$filters = $_REQUEST['filter'];
+			if (is_array($filters)){
+				$generatedFilters = array();
+				foreach ($filters as $field => $value) {
+					$generatedFilters[$field] = $value;
+				}
+			}
+
+			// add pagination and filter data into symphony context if Symphony does not provide it
+			Administration::instance()->Page->addElementToHead(
+				new XMLElement(
+					'script', 
+					'if (! Symphony.Context.get(\'env\').pagination) Symphony.Context.get(\'env\').pagination='.json_encode($pagination).';' .
+					'if (! Symphony.Context.get(\'env\').filters) Symphony.Context.get(\'env\').filters='.json_encode($generatedFilters).';'
+					, array(
+						'type' => 'text/javascript'
+					)
+				)
+			);
+
 			Administration::instance()->Page->addScriptToHead(
 				URL . '/extensions/order_entries/assets/order_entries.publish.js'
 			);
@@ -150,6 +233,38 @@
 				");
 			}
 
+			// Prior version 2.1.4
+			if(version_compare($previousVersion, '2.1.4', '<')) {
+				$status[] = Symphony::Database()->query("
+					ALTER TABLE `tbl_fields_order_entries`
+					ADD `disable_pagination` enum('yes','no')
+					DEFAULT 'yes'
+				");
+			}
+
+			// Prior version 2.2
+			if(version_compare($previousVersion, '2.2', '<')) {
+				$status[] = Symphony::Database()->query("
+					ALTER TABLE `tbl_fields_order_entries`
+					ADD `filtered_fields` varchar(255) DEFAULT NULL
+					DEFAULT NULL
+				");
+
+				$fields =  Symphony::Database()->fetchCol('field_id',"SELECT field_id FROM `tbl_fields_order_entries`");
+
+				foreach ($fields as $key => $field) {					
+					$status[] = Symphony::Database()->query("
+						ALTER TABLE `tbl_entries_data_{$field}`
+						DROP INDEX `entry_id`
+					");
+
+					$status[] = Symphony::Database()->query("
+						ALTER TABLE `tbl_entries_data_{$field}`
+						ADD UNIQUE `unique`(`entry_id`)
+					");
+				}
+			}
+
 			// Report status
 			if(in_array(false, $status, true)) {
 				return false;
@@ -169,6 +284,8 @@
 					`field_id` int(11) unsigned NOT NULL,
 					`force_sort` enum('yes','no') default 'no',
 					`hide` enum('yes','no') default 'no',
+					`disable_pagination` enum('yes','no') default 'no',
+					`filtered_fields` varchar(255) DEFAULT NULL,
 					PRIMARY KEY  (`id`),
 					UNIQUE KEY `field_id` (`field_id`)
 				) TYPE=MyISAM

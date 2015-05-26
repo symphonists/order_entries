@@ -7,12 +7,21 @@
 	});
 
 	Symphony.Extensions.OrderEntries = function() {
-		var table, fieldId,	direction, oldSorting, newSorting;
+		var table, fieldId,	direction, oldSorting, newSorting, startValue, filters;
 
 		var init = function() {
 			table = Symphony.Elements.contents.find('table');
 			fieldId = table.attr('data-order-entries-id');
 			direction = table.attr('data-order-entries-direction');
+			filters = Symphony.Context.get('env').filters;
+
+			// convert filters into a query string
+			if (filters){
+				filters = {"filters":filters};
+				filters = '&' + $.param(filters)
+			} else {
+				filters = '';
+			}
 
 			// Add help
 			Symphony.Elements.breadcrumbs.append('<p class="inactive"><span>– ' + Symphony.Language.get('drag to reorder') + '</span></p>');
@@ -30,6 +39,11 @@
 
 			// Process sort order
 			oldSorting = getState();
+			startValue = parseInt(table.find('.order-entries-item').eq(0).text(),10);
+			var assumedStartValue = Symphony.Context.get('env').pagination['max-rows'] * (Symphony.Context.get('env').pagination['current'] - 1) + 1;
+			if (startValue == 0 || direction == 'asc' && startValue < assumedStartValue) {
+				startValue = assumedStartValue;
+			}
 			table.on('orderstop.orderable', processState);
 		};
 
@@ -49,18 +63,20 @@
 				$.ajax({
 					type: 'GET',
 					url: Symphony.Context.get('symphony') + '/extension/order_entries/save/',
-					data: newSorting + '&field=' + fieldId + '&' + Symphony.Utilities.getXSRF(true),
+					data: newSorting + '&field=' + fieldId + filters + '&' + Symphony.Utilities.getXSRF(true),
 					success: function() {
 						oldSorting = newSorting;
 
-						// Update indexes
+					// Update indexes
 						var items = table.find('.order-entries-item');
 						items.each(function(index) {
 							if(direction == 'asc') {
-								$(this).text(index + 1);
+								$(this).text(index + startValue);
 							}
 							else {
-								$(this).text(items.length - index);
+								var largest = startValue;
+								if ( items.length > largest ) largest = items.length;
+								$(this).text(largest - index);
 							}
 						});
 					},
@@ -80,10 +96,12 @@
 
 			states = items.map(function(index) {
 				if(direction == 'asc') {
-					return this.name + '=' + (index + 1);
+					return this.name + '=' + (index + startValue);
 				}
 				else {
-					return this.name + '=' + (items.length - index);
+					var largest = startValue;
+					if ( items.length > largest ) largest = items.length;
+					return this.name + '=' + (largest - index);
 				}
 			}).get().join('&');
 

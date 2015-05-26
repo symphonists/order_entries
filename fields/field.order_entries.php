@@ -41,7 +41,26 @@
 			$status = self::__OK__;
 			$increment_subsequent_order = false;
 
+			$filters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$this->get('id')} WHERE Field like 'field_%';");
+			// for now if there are any filters completely ignore any override.
+			if (!empty($filters)){
+				$filterString = implode(',', $filters);
+				$current_values = Symphony::Database()->fetch("
+					SELECT value, {$filterString}
+					FROM tbl_entries_data_{$this->get('id')}
+					WHERE entry_id=".$entry_id."
+				");
+				$result= array();
+				foreach ($current_values as $key => $row) {
+					foreach ($row as $col => $value) {
+						$result[$col][$key] = $value;
+					}
+				}
+				return $result;
+			}
+
 			if($entry_id) {
+
 				$new_value = $data;
 				$current_value = Symphony::Database()->fetchVar("value", 0, "
 					SELECT value
@@ -108,6 +127,17 @@
 
 			$label->setValue(__('%s Force manual sorting', array($input->generate())));
 			$div->appendChild($label);
+
+			$label = Widget::Label();
+			$label->setAttribute('class', 'column');
+			$input = Widget::Input("fields[{$order}][disable_pagination]", 'yes', 'checkbox');
+
+			if($this->get('disable_pagination') == 'yes') {
+				$input->setAttribute('checked', 'checked');
+			}
+
+			$label->setValue(__('%s Disable Pagination', array($input->generate())));
+			$div->appendChild($label);
 			$wrapper->appendChild($div);
 
 			// Display options
@@ -128,6 +158,91 @@
 			$this->appendShowColumnCheckbox($div);
 			$fieldset->appendChild($div);
 			$wrapper->appendChild($fieldset);
+
+			//filtered orders
+
+			$fieldset = new XMLElement('fieldset');
+
+			$div = new XMLElement('h3', __('Filtered Ordering'));
+			$fieldset->appendChild($div);
+
+			$section = SectionManager::fetch($this->get('parent_section'));
+			if (!is_object($section)){
+				// you need to save first
+				$div = new XMLElement('p', __('You have to save this field before you can add filtered ordering'));
+				$fieldset->appendChild($div);
+			} else {
+				$fields = $section->fetchFields();
+
+				$options = array();
+
+				$filteredFields = $this->get('filtered_fields');
+				if (!is_array($filteredFields)){
+					$filteredFields = explode(',', $filteredFields);
+				}
+
+				if (is_array($fields)) {
+					foreach ($fields as $field) {
+						$selected = in_array($field->get('id'), $filteredFields);
+						$options[] = array($field->get('id'),$selected,$field->get('label'));
+					}
+				}
+
+				$label = Widget::Label(__('Fields'));
+				$label->appendChild(
+					Widget::Select("fields[{$order}][filtered_fields][]", $options, array(
+						'multiple' => 'multiple',
+						'data-required' => 'false'
+					))
+				);
+
+				$fieldset->appendChild($label);
+
+			}
+			
+			$wrapper->appendChild($fieldset);
+
+
+		}
+
+		private function updateFilterTable(){
+			$filteredFields = $this->get('filtered_fields');
+			if (!is_array($filteredFields)){
+				$filteredFields = explode(',', $filteredFields);
+			}
+
+			$orderFieldId = $this->get('id');
+
+			// fetch existing table schema
+			$currentFilters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$orderFieldId} WHERE Field like 'field_%';");
+						
+			//change the value format to match the filtered fields stored
+			foreach ($currentFilters as $key => $value) {
+				$currentFilters[$key] = substr($value, 6);
+			}
+
+			$newFilters = array_diff($filteredFields, $currentFilters);
+			$removedFilters = array_diff($currentFilters, $filteredFields);
+
+			foreach ($removedFilters as $key => $field_id) {
+				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP COLUMN `field_{$field_id}`");
+			}
+
+			foreach ($newFilters as $key => $field_id) {
+				//maybe in the future fields can give supported filters until then using a varchar for flexibility
+				$fieldtype = "varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL";
+
+				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD COLUMN `field_{$field_id}`{$fieldtype}");
+			}
+
+			if (!empty($newFilters) || !empty($removedFilters)){
+				$fields = '';
+				foreach ($filteredFields as $field_id) {
+					$fields .= ",`field_{$field_id}` ";
+				}
+				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP INDEX `unique`;");
+				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD UNIQUE `unique`(`entry_id` {$fields});");
+			}
 		}
 
 		function commit() {
@@ -140,10 +255,16 @@
 				return false;
 			}
 
+			$filteredFields = $this->get('filtered_fields');
+			if (!isset($filteredFields))
+				$filteredFields = array();
+
 			$fields = array();
 
 			$fields['field_id'] = $id;
 			$fields['force_sort'] = $this->get('force_sort');
+			$fields['disable_pagination'] = $this->get('disable_pagination');
+			$fields['filtered_fields'] = implode(',', $filteredFields);
 			$fields['hide'] = $this->get('hide');
 
 			// Update section's sorting field
@@ -152,12 +273,14 @@
 				$section->setSortingField($id);
 			}
 
+			$this->updateFilterTable();
+
 			Symphony::Database()->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
 			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
 		}
 
 		function displayPublishPanel(&$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null) {
-			$value = $data['value'];
+			$value = $this->getOrderValue($data);
 
 			$label = Widget::Label($this->get('label'));
 			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
@@ -217,7 +340,7 @@
 					`entry_id` int(11) unsigned NOT null,
 					`value` double default null,
 					PRIMARY KEY  (`id`),
-					UNIQUE KEY `entry_id` (`entry_id`),
+					UNIQUE KEY `unique` (`entry_id`),
 					KEY `value` (`value`)
 				) TYPE=MyISAM;
 			");
@@ -241,22 +364,118 @@
 			return true;
 		}
 
+		public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC') {
+			
+			$filterableFields = explode(',', $this->get('filtered_fields'));
+			$section_id = $this->get('parent_section');
+
+			$orderEntriesExtension = ExtensionManager::create('order_entries');
+			$filters = $orderEntriesExtension->getFilters($filterableFields,$section_id);
+
+			$filteringParams = $this->buildFilteringSQL($filters,'`ed`.');
+
+			if (in_array(strtolower($order), array('random', 'rand'))) {
+				$sort = 'ORDER BY RAND()';
+			} else {
+				$joins .= "LEFT OUTER JOIN `tbl_entries_data_".$this->get('id')."` AS `ed` ON (`e`.`id` = `ed`.`entry_id`{$filteringParams}) ";
+				$sort = 'ORDER BY `ed`.`value` ' . $order;
+			}
+		}
+
+		public function buildFilteringSQL($filters,$prefix =''){
+
+			$filterableFields = $this->get('filtered_fields');
+
+			//no filters no sql to add
+			if (empty($filterableFields)) return "";
+
+			$filterableFields = explode(',', $filterableFields);
+
+			$where = '' ;
+
+			foreach ($filterableFields as $key => $filterable_field) {
+				if (isset($filters[$filterable_field])){
+					$where .= " AND {$prefix}field_{$filterable_field} = '{$filters[$filterable_field]}'";
+				} else {						
+					$where .= " AND {$prefix}field_{$filterable_field} is NULL";
+				}
+			}
+
+			return $where;
+		}
+
+		private function getOrderValue($data){
+
+			$filterableFields = $this->get('filtered_fields');
+
+			//there are no filters to apply so should just be a single value
+			if (empty($filterableFields)) return $data['value'];
+
+			$filterableFields = explode(',', $filterableFields);
+			$section_id = $this->get('parent_section');
+
+			$orderEntriesExtension = ExtensionManager::create('order_entries');
+			$filters = $orderEntriesExtension->getFilters($filterableFields,$section_id);
+
+
+			if (!is_array($data['value'])){
+				foreach ($data as $key => $value) {
+					$data[$key] = array($value);
+				}
+			}
+
+			if (is_array($data['value'])){
+				$keys = array_keys($data['value']);
+
+				foreach ($filterableFields as $filtered_field_id) {
+					$filter = $filters[$filtered_field_id];
+
+					if (isset($data['field_' . $filtered_field_id])){
+						$matchingKeys = array_search($filter, $data['field_' . $filtered_field_id]);
+					} else {
+						$matchingKeys = array();
+					}
+
+					if (empty($matchingKeys) && !is_int($matchingKeys)){
+						$matchingKeys = array();
+					} else if (!is_array($matchingKeys)) {
+						$matchingKeys = array($matchingKeys);
+					}
+
+					//intersect the original keys with the filtered ones which match the search - should leave one or no items
+					$keys = array_intersect($keys, $matchingKeys);
+				}
+
+				if ( empty($keys) ){
+					//this view is not sorted
+					return 0;
+				} else {
+					return $data['value'][current($keys)];
+				}
+			} else {
+				return 0;
+			}
+		}
+
 		public function prepareTableValue($data, XMLElement $link = null) {
+
+			$orderValue = $this->getOrderValue($data);
+
 			if(!$link) {
-				return sprintf('<span class="order-entries-item">%d</span>', $data['value']);
+				return sprintf('<span class="order-entries-item">%d</span>', $orderValue);
 			}
 			else {
-				$link->setValue($data['value']);
+				$link->setValue($orderValue);
 				return $link->generate();
 			}
 		}
 
 		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null, $entry_id = null) {
-			$wrapper->appendChild(new XMLElement($this->get('element_name'), $data['value']));
+			$wrapper->appendChild(new XMLElement($this->get('element_name'), $this->getOrderValue($data) ));
 		}
 
 		public function getParameterPoolValue(Array $data) {
-			return $data['value'];
+			return $this->getOrderValue($data);
 		}
 
 	}
