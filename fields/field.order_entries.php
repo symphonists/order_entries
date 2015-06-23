@@ -41,9 +41,16 @@
 			$status = self::__OK__;
 			$increment_subsequent_order = false;
 
-			$filters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$this->get('id')} WHERE Field like 'field_%';");
+			$filters = Symphony::Database()->fetchCol('Field',
+				"SHOW COLUMNS FROM tbl_entries_data_{$this->get('id')} WHERE Field like 'field_%';"
+			);
+			
+			if ($entry_id != null) {
+				$entry_id = General::intval($entry_id);
+			}
+			
 			// for now if there are any filters completely ignore any override.
-			if (!empty($filters)){
+			if (!empty($filters) && $entry_id){
 				$filterString = implode(',', $filters);
 				$current_values = Symphony::Database()->fetch("
 					SELECT value, {$filterString}
@@ -60,7 +67,6 @@
 			}
 
 			if($entry_id) {
-
 				$new_value = $data;
 				$current_value = Symphony::Database()->fetchVar("value", 0, "
 					SELECT value
@@ -231,7 +237,6 @@
 			foreach ($newFilters as $key => $field_id) {
 				//maybe in the future fields can give supported filters until then using a varchar for flexibility
 				$fieldtype = "varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL";
-
 				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD COLUMN `field_{$field_id}`{$fieldtype}");
 			}
 
@@ -409,7 +414,9 @@
 			$filterableFields = $this->get('filtered_fields');
 
 			//there are no filters to apply so should just be a single value
-			if (empty($filterableFields)) return $data['value'];
+			if (empty($filterableFields)) {
+				return $data['value'];
+			}
 
 			$filterableFields = explode(',', $filterableFields);
 			$section_id = $this->get('parent_section');
