@@ -207,11 +207,16 @@
 						
 			//change the value format to match the filtered fields stored
 			foreach ($currentFilters as $key => $value) {
-				$currentFilters[$key] = substr($value, 6);
+				$currentFilter = substr($value, 6);
+				if (!empty($currentFilter)) {
+					$currentFilters[$key] = $currentFilter;
+				} else {
+					unset($currentFilters[$key]);
+				}
 			}
 
-			$newFilters = array_diff($filteredFields, $currentFilters);
-			$removedFilters = array_diff($currentFilters, $filteredFields);
+			$newFilters = array_filter(array_diff($filteredFields, $currentFilters));
+			$removedFilters = array_filter(array_diff($currentFilters, $filteredFields));
 
 			foreach ($removedFilters as $key => $field_id) {
 				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP COLUMN `field_{$field_id}`");
