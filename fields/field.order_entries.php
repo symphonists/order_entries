@@ -412,6 +412,10 @@
 			$orderEntriesExtension = ExtensionManager::create('order_entries');
 			$filters = $orderEntriesExtension->getFilters($filterableFields,$section_id);
 
+			// if there are no filter, bail out
+			if (empty($filters)) {
+				return $data['value'];
+			}
 
 			if (!is_array($data['value'])){
 				foreach ($data as $key => $value) {
