@@ -48,23 +48,6 @@
 			if ($entry_id != null) {
 				$entry_id = General::intval($entry_id);
 			}
-			
-			// for now if there are any filters completely ignore any override.
-			if (!empty($filters) && $entry_id){
-				$filterString = implode(',', $filters);
-				$current_values = Symphony::Database()->fetch("
-					SELECT value, {$filterString}
-					FROM tbl_entries_data_{$this->get('id')}
-					WHERE entry_id=".$entry_id."
-				");
-				$result= array();
-				foreach ($current_values as $key => $row) {
-					foreach ($row as $col => $value) {
-						$result[$col][$key] = $value;
-					}
-				}
-				return $result;
-			}
 
 			if($entry_id) {
 				$new_value = $data;
