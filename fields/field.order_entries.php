@@ -447,7 +447,7 @@
 
 				if ( empty($keys) ){
 					//this view is not sorted
-					return 0;
+					return current($data['value']);
 				} else {
 					return $data['value'][current($keys)];
 				}
