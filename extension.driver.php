@@ -140,6 +140,23 @@
 						if($this->force_sort == 'yes') {
 							$table->setAttribute('data-order-entries-force', 'true');
 						}
+
+						$field = FieldManager::fetch($this->field_id);
+
+						if ($field->get('show_column') == 'no'){
+
+							// sort order is not provided by field, so add manually
+							$tbody = $table->getChildByName('tbody',0);
+
+							//not looping as only the first row is required for sorting and is far more efficient
+							$tr = $tbody->getChildByName('tr',0);
+
+								$entry_id = str_replace('id-', '', $tr->getAttribute('id'));
+								$entry = current(EntryManager::fetch($entry_id));
+								$data = $entry->getData($this->field_id);
+								$order = $field->getParameterPoolValue($data);
+								$tr->setAttribute('data-order',$order);
+						}
 						
 						break;
 					}
