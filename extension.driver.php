@@ -143,7 +143,7 @@
 
 						$field = FieldManager::fetch($this->field_id);
 
-						if ($field->get('show_column') == 'no'){
+						if ($field && $field->get('show_column') == 'no'){
 
 							// sort order is not provided by field, so add manually
 							$tbody = $table->getChildByName('tbody',0);
