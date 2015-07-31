@@ -39,7 +39,11 @@
 
 			// Process sort order
 			oldSorting = getState();
-			startValue = parseInt(table.find('.order-entries-item').eq(0).text(),10);
+			if (table.find('.order-entries-item').length > 0){
+				startValue = parseInt(table.find('.order-entries-item').eq(0).text(),10);
+			} else {
+				startValue = parseInt(table.find('tbody tr').eq(0).data('order'),10);				
+			}
 			var assumedStartValue = Symphony.Context.get('env').pagination['max-rows'] * (Symphony.Context.get('env').pagination['current'] - 1) + 1;
 			if (startValue == 0 || direction == 'asc' && startValue < assumedStartValue) {
 				startValue = assumedStartValue;
@@ -68,15 +72,17 @@
 						oldSorting = newSorting;
 
 					// Update indexes
-						var items = table.find('.order-entries-item');
+						var items = table.find('tbody tr');
 						items.each(function(index) {
 							if(direction == 'asc') {
-								$(this).text(index + startValue);
+								$(this).data('order',index + startValue);
+								$(this).find('.order-entries-item').text(index + startValue);
 							}
 							else {
 								var largest = startValue;
 								if ( items.length > largest ) largest = items.length;
-								$(this).text(largest - index);
+								$(this).data('order',largest - index);
+								$(this).find('.order-entries-item').text(largest - index);
 							}
 						});
 					},
