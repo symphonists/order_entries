@@ -419,7 +419,7 @@
 
 			if (!is_array($data['value'])){
 				foreach ($data as $key => $value) {
-					$data[$key] = array($value);
+					$data[$key] = array(strtolower(General::sanitize($value)));
 				}
 			}
 

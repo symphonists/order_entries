@@ -60,7 +60,7 @@
 					$filtered_field_id = FieldManager::fetchFieldIDFromElementName($field_name,$section_id);
 					if (in_array($filtered_field_id, $filterableFields)){
 						//ensuring that capitalization will never be an issue
-						$filters[$filtered_field_id] = strtolower($value);
+						$filters[$filtered_field_id] = strtolower(General::sanitize($value));
 					}
 					unset($filters[$field_name]);
 				}
@@ -73,6 +73,8 @@
 				foreach ($filters as $filtered_field_id => $value) {
 					if (!in_array($filtered_field_id, $filterableFields)){
 						unset($filters[$filtered_field_id]);
+					} else {
+						$filters[$filtered_field_id] = strtolower(General::sanitize($value));
 					}
 				}
 
