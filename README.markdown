@@ -37,4 +37,18 @@ Once saved, filtered views will have separate orders depending on your settings.
 It is very important to note that with version 2.2 the "Filter value" used within the publish page matches whatever you put in your datasource.
 Sorting and order values are determined from the matching datasource parameter.
 If in the publish page was filtered by "Home" and your datasource filter says "home" the datasource ordering outputs will not match.
-An update to tackle this more comprehensively will be released shortly.
+
+Note: If you set filtered ordering, and within the backend no filters unset all sorting is done without any backend filters, and your datasource contains a filter for the same field as 'filtered ordering' no ordering will take place. As there are no values set with the backend filters matching the ones in your datasource.
+
+### Example Use Case
+
+You have been asked to design a schema for a cooking website. 
+Where each recipie has a number ingredients, thus you link your ingredients to your recipes using an association field.
+The client has also asked to be able to do a dedicated page per ingredient showing the suggested recipies, and they want to order all the supported recipes manually.
+
+Within your recipes section, you add a 'filtered ordering' on the 'ingredients' field
+This will create a distinct sort order for each ingredient when filtered within your backend.
+
+Thus the recipe 'Spagetti Bolognese' can be in 1st place for 'spagetti', 2nd place for 'tomato sauce' and 4th place for 'minced meat'. 
+Whilst 'lasagna' could be in 3rd place for 'tomato sauce' and 3rd place for 'minced meat'. 
+At the same time in the general recipie classification (no filters) 'Spagetti Bolognese' ranks 5th and 'Lasagna' 15th.
