@@ -105,7 +105,7 @@
 						$this->force_sort = $field->get('force_sort');
 						$this->field_id = $field->get('id');
 						$this->direction = $section->getSortingOrder();
-					
+
 						// Initialise manual ordering
 						$this->addComponents();
 						if ($field->get('disable_pagination') == 'yes'){
@@ -154,10 +154,13 @@
 							$tr = $tbody->getChildByName('tr',0);
 
 								$entry_id = str_replace('id-', '', $tr->getAttribute('id'));
-								$entry = current(EntryManager::fetch($entry_id));
-								$data = $entry->getData($this->field_id);
-								$order = $field->getParameterPoolValue($data);
-								$tr->setAttribute('data-order',$order);
+
+								if ($entry_id){
+									$entry = current(EntryManager::fetch($entry_id));
+									$data = $entry->getData($this->field_id);
+									$order = $field->getParameterPoolValue($data);
+									$tr->setAttribute('data-order',$order);
+								}
 						}
 						
 						break;
@@ -266,7 +269,6 @@
 				$status[] = Symphony::Database()->query("
 					ALTER TABLE `tbl_fields_order_entries`
 					ADD `filtered_fields` varchar(255) DEFAULT NULL
-					DEFAULT NULL
 				");
 
 				$fields =  Symphony::Database()->fetchCol('field_id',"SELECT field_id FROM `tbl_fields_order_entries`");
@@ -306,7 +308,8 @@
 					`disable_pagination` enum('yes','no') default 'no',
 					`filtered_fields` varchar(255) DEFAULT NULL,
 					PRIMARY KEY  (`id`),
-					UNIQUE KEY `field_id` (`field_id`)
+					UNIQUE KEY `field_id` (`field_id`),
+					UNIQUE KEY `unique`(`entry_id`)
 				) TYPE=MyISAM
 			");
 		}

@@ -185,7 +185,10 @@
 					))
 				);
 
+				$text = new XMLElement('p', __('Filtered Ordering is an advanced use case for Order Entries. Refer to the readme for further details. Do not select any field unless you understand what it entails as it might lead to unexpected results.'), array('class' => 'help'));
+
 				$fieldset->appendChild($label);
+				$fieldset->appendChild($text);
 
 			}
 			
@@ -413,7 +416,7 @@
 			$filters = $orderEntriesExtension->getFilters($filterableFields,$section_id);
 
 			// if there are no filter, bail out
-			if (empty($filters)) {
+			if (empty($filterableFields)) {
 				return $data['value'];
 			}
 
