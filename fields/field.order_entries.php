@@ -44,7 +44,7 @@
 			if ($entry_id != null) {
 				$entry_id = General::intval($entry_id);
 			}
-		
+
 			if (is_array($data)){
 				//TODO Auto Increment for filtered ordering for now just return the data as it is already properly formatted
 				return $data;
@@ -284,8 +284,11 @@
 			$inputs = new XMLElement('div');
 
 			// If data is an array there must be filtered values
-			if (is_array($data)){
+			if (is_array($data) && !empty($data)){
 				foreach ($data as $col => $row) {
+					if (!is_array($row)){
+						$row = array($row);
+					}
 					foreach ($row as $key => $value) {
 						$input = Widget::Input(
 							'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . '][' . $col . '][' . $key . ']' . $fieldnamePostfix,
