@@ -40,14 +40,15 @@
 		function processRawFieldData($data, &$status, &$message = null, $simulate = false, $entry_id = null) {
 			$status = self::__OK__;
 			$increment_subsequent_order = false;
-
-			$filters = Symphony::Database()->fetchCol('Field',
-				"SHOW COLUMNS FROM tbl_entries_data_{$this->get('id')} WHERE Field like 'field_%';"
-			);
 			
 			if ($entry_id != null) {
 				$entry_id = General::intval($entry_id);
 			}
+		
+			if (is_array($data)){
+				//TODO Auto Increment for filtered ordering for now just return the data as it is already properly formatted
+				return $data;
+			} 
 
 			if($entry_id) {
 				$new_value = $data;
@@ -278,29 +279,47 @@
 		function displayPublishPanel(&$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null) {
 			$value = $this->getOrderValue($data);
 
-			$label = Widget::Label($this->get('label'));
-			if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
-
 			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 
-			$input = Widget::Input(
-				'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . ']' . $fieldnamePostfix,
-				(strlen($value) !== 0 ? (string)$value : (string)++$max_position["max"]),
-				($this->get('hide') == 'yes') ? 'hidden' : 'text'
-			);
+			$inputs = new XMLElement('div');
 
-			if($this->get('hide') != 'yes') {
-				$label->appendChild($input);
-				if($flagWithError != null) {
-					$wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
+			// If data is an array there must be filtered values
+			if (is_array($data)){
+				foreach ($data as $col => $row) {
+					foreach ($row as $key => $value) {
+						$input = Widget::Input(
+							'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . '][' . $col . '][' . $key . ']' . $fieldnamePostfix,
+							(strlen($value) !== 0 ? (string)$value : (string)++$max_position["max"]),
+							($this->get('hide') == 'yes' || $col != 'value') ? 'hidden' : 'text'
+						);
+						$inputs->appendChild($input);
+					}
+				}
+				// for now hide all 
+				$wrapper->addClass('irrelevant');
+				$wrapper->appendChild($inputs);
+			} else {
+				$input = Widget::Input(
+					'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . ']' . $fieldnamePostfix,
+					(strlen($value) !== 0 ? (string)$value : (string)++$max_position["max"]),
+					($this->get('hide') == 'yes') ? 'hidden' : 'text'
+				);
+
+				if($this->get('hide') != 'yes') {
+					$label = Widget::Label($this->get('label'));
+					if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
+					$label->appendChild($input);
+					if($flagWithError != null) {
+						$wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
+					}
+					else {
+						$wrapper->appendChild($label);
+					}
 				}
 				else {
-					$wrapper->appendChild($label);
+					$wrapper->addClass('irrelevant');
+					$wrapper->appendChild($input);
 				}
-			}
-			else {
-				$wrapper->addClass('irrelevant');
-				$wrapper->appendChild($input);
 			}
 		}
 
@@ -321,7 +340,13 @@
 			}
 
 			// Check type
-			if(strlen($data) > 0 && !is_numeric($data)) {
+			if(is_array($data) && is_array($data['value'])){
+				$numeric = array_filter($data['value'],'is_numeric');
+				if (sizeof($numeric) != sizeof($data['value'])){
+					$message = __('Must be a number.');
+					return self::__INVALID_FIELDS__;					
+				}
+			} else if(strlen($data) > 0 && !is_numeric($data)) {
 				$message = __('Must be a number.');
 				return self::__INVALID_FIELDS__;
 			}
