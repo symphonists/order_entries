@@ -41,26 +41,15 @@
 			$status = self::__OK__;
 			$increment_subsequent_order = false;
 
-			$filters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$this->get('id')} WHERE Field like 'field_%';");
-			// for now if there are any filters completely ignore any override.
-			if (!empty($filters)){
-				$filterString = implode(',', $filters);
-				$current_values = Symphony::Database()->fetch("
-					SELECT value, {$filterString}
-					FROM tbl_entries_data_{$this->get('id')}
-					WHERE entry_id=".$entry_id."
-				");
-				$result= array();
-				foreach ($current_values as $key => $row) {
-					foreach ($row as $col => $value) {
-						$result[$col][$key] = $value;
-					}
-				}
-				return $result;
+			$filters = Symphony::Database()->fetchCol('Field',
+				"SHOW COLUMNS FROM tbl_entries_data_{$this->get('id')} WHERE Field like 'field_%';"
+			);
+			
+			if ($entry_id != null) {
+				$entry_id = General::intval($entry_id);
 			}
 
 			if($entry_id) {
-
 				$new_value = $data;
 				$current_value = Symphony::Database()->fetchVar("value", 0, "
 					SELECT value
@@ -218,11 +207,16 @@
 						
 			//change the value format to match the filtered fields stored
 			foreach ($currentFilters as $key => $value) {
-				$currentFilters[$key] = substr($value, 6);
+				$currentFilter = substr($value, 6);
+				if (!empty($currentFilter)) {
+					$currentFilters[$key] = $currentFilter;
+				} else {
+					unset($currentFilters[$key]);
+				}
 			}
 
-			$newFilters = array_diff($filteredFields, $currentFilters);
-			$removedFilters = array_diff($currentFilters, $filteredFields);
+			$newFilters = array_filter(array_diff($filteredFields, $currentFilters));
+			$removedFilters = array_filter(array_diff($currentFilters, $filteredFields));
 
 			foreach ($removedFilters as $key => $field_id) {
 				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP COLUMN `field_{$field_id}`");
@@ -231,7 +225,6 @@
 			foreach ($newFilters as $key => $field_id) {
 				//maybe in the future fields can give supported filters until then using a varchar for flexibility
 				$fieldtype = "varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL";
-
 				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD COLUMN `field_{$field_id}`{$fieldtype}");
 			}
 
@@ -409,7 +402,9 @@
 			$filterableFields = $this->get('filtered_fields');
 
 			//there are no filters to apply so should just be a single value
-			if (empty($filterableFields)) return $data['value'];
+			if (empty($filterableFields)) {
+				return $data['value'];
+			}
 
 			$filterableFields = explode(',', $filterableFields);
 			$section_id = $this->get('parent_section');
@@ -417,6 +412,10 @@
 			$orderEntriesExtension = ExtensionManager::create('order_entries');
 			$filters = $orderEntriesExtension->getFilters($filterableFields,$section_id);
 
+			// if there are no filter, bail out
+			if (empty($filters)) {
+				return $data['value'];
+			}
 
 			if (!is_array($data['value'])){
 				foreach ($data as $key => $value) {
@@ -448,7 +447,7 @@
 
 				if ( empty($keys) ){
 					//this view is not sorted
-					return 0;
+					return current($data['value']);
 				} else {
 					return $data['value'][current($keys)];
 				}
