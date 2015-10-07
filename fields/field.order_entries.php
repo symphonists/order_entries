@@ -243,7 +243,9 @@
 					// ignore. This can fail is not index exists.
 					// See #73
 				}
-				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD UNIQUE `unique`(`entry_id` {$fields});");
+				if (!empty($fields)) {
+					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD UNIQUE `unique`(`entry_id` {$fields});");
+				}
 			}
 		}
 
