@@ -308,8 +308,7 @@
 					`disable_pagination` enum('yes','no') default 'no',
 					`filtered_fields` varchar(255) DEFAULT NULL,
 					PRIMARY KEY  (`id`),
-					UNIQUE KEY `field_id` (`field_id`),
-					UNIQUE KEY `unique`(`entry_id`)
+					UNIQUE KEY `field_id` (`field_id`)
 				) TYPE=MyISAM
 			");
 		}
