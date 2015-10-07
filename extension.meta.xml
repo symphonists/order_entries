@@ -18,7 +18,7 @@
 		</author>
 	</authors>
 	<releases>
-		<release version="2.3.0" date="2015-08-11" min="2.5" max="2.6.x">
+		<release version="2.3.0" date="2015-09-01" min="2.5" max="2.6.x">
 			- Added filtered ordering
 			- Bug fixes
 		</release>
