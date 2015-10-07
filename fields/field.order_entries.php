@@ -427,7 +427,7 @@
 			foreach ($filterableFields as $key => $filterable_field) {
 				if (isset($filters[$filterable_field])){
 					$where .= " AND {$prefix}field_{$filterable_field} = '{$filters[$filterable_field]}'";
-				} else {						
+				} else {
 					$where .= " AND {$prefix}field_{$filterable_field} is NULL";
 				}
 			}
