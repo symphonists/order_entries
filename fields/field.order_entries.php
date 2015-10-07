@@ -237,7 +237,12 @@
 				foreach ($filteredFields as $field_id) {
 					$fields .= ",`field_{$field_id}` ";
 				}
-				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP INDEX `unique`;");
+				try {
+					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP INDEX `unique`;");
+				} catch (Exception $ex) {
+					// ignore. This can fail is not index exists.
+					// See #73
+				}
 				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD UNIQUE `unique`(`entry_id` {$fields});");
 			}
 		}
