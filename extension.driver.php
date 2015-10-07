@@ -273,7 +273,7 @@
 
 				$fields =  Symphony::Database()->fetchCol('field_id',"SELECT field_id FROM `tbl_fields_order_entries`");
 
-				foreach ($fields as $key => $field) {					
+				foreach ($fields as $key => $field) {
 					$status[] = Symphony::Database()->query("
 						ALTER TABLE `tbl_entries_data_{$field}`
 						DROP INDEX `entry_id`
