@@ -299,7 +299,7 @@
 					foreach ($row as $key => $value) {
 						$input = Widget::Input(
 							'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . '][' . $col . '][' . $key . ']' . $fieldnamePostfix,
-							(strlen($value) !== 0 ? (string)$value : (string)++$max_position["max"]),
+							(strlen($value) !== 0 || $col != 'value') ? (string)$value : (string)++$max_position["max"],
 							($this->get('hide') == 'yes' || $col != 'value') ? 'hidden' : 'text'
 						);
 						$inputs->appendChild($input);
