@@ -208,7 +208,7 @@
 
 			// fetch existing table schema
 			$currentFilters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$orderFieldId} WHERE Field like 'field_%';");
-						
+			
 			//change the value format to match the filtered fields stored
 			foreach ($currentFilters as $key => $value) {
 				$currentFilter = substr($value, 6);
@@ -299,7 +299,7 @@
 					foreach ($row as $key => $value) {
 						$input = Widget::Input(
 							'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . '][' . $col . '][' . $key . ']' . $fieldnamePostfix,
-							(strlen($value) !== 0 ? (string)$value : (string)++$max_position["max"]),
+							(strlen($value) !== 0 || $col != 'value') ? (string)$value : (string)++$max_position["max"],
 							($this->get('hide') == 'yes' || $col != 'value') ? 'hidden' : 'text'
 						);
 						$inputs->appendChild($input);
@@ -354,7 +354,7 @@
 				$numeric = array_filter($data['value'],'is_numeric');
 				if (sizeof($numeric) != sizeof($data['value'])){
 					$message = __('Must be a number.');
-					return self::__INVALID_FIELDS__;					
+					return self::__INVALID_FIELDS__;
 				}
 			} else if(strlen($data) > 0 && !is_numeric($data)) {
 				$message = __('Must be a number.');
