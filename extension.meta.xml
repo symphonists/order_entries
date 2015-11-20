@@ -18,8 +18,14 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.3.2" date="2015-11-20" min="2.5" max="2.6.x">
+			- Fix bug where value was also being set for null filters
+		</release>
 		<release version="2.3.1" date="2015-10-07" min="2.5" max="2.6.x">
 			- Bug fixes (#69, #72, #73)
+		</release>
+		<release version="2.3.2" date="2015-11-20" min="2.5" max="2.6.x">
+			- Fix bug where value was also being set for null filters
 		</release>
 		<release version="2.3.0" date="2015-09-01" min="2.5" max="2.6.x">
 			- Added filtered ordering
