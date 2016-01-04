@@ -320,7 +320,7 @@
 					if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
 					$label->appendChild($input);
 					if($flagWithError != null) {
-						$wrapper->appendChild(Widget::wrapFormElementWithError($label, $flagWithError));
+						$wrapper->appendChild(Widget::Error($label, $flagWithError));
 					}
 					else {
 						$wrapper->appendChild($label);
