@@ -18,6 +18,10 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.3.3" date="2016-01-05" min="2.5" max="2.6.x">
+			- Fix bug with core API: Widget::wrapFormElementWithError is now Widget::Error
+			- Replace mistyped delegate with new one
+		</release>
 		<release version="2.3.2" date="2015-11-20" min="2.5" max="2.6.x">
 			- Fix bug where value was also being set for null filters
 		</release>
