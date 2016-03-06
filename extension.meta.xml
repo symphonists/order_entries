@@ -18,6 +18,10 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.3.4" date="2016-03-06" min="2.5" max="2.x.x">
+			- Fix the broken "Hide on publish pages" that always hid the field (#78)
+			- Added a LICENCE.txt file
+		</release>
 		<release version="2.3.3" date="2016-01-05" min="2.5" max="2.6.x">
 			- Fix bug with core API: Widget::wrapFormElementWithError is now Widget::Error
 			- Replace mistyped delegate with new one
