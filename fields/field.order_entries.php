@@ -289,6 +289,8 @@
 			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 
 			$inputs = new XMLElement('div');
+			$isHidden = $this->get('hide') == 'yes';
+			$label = Widget::Label($isHidden ? '' : $this->get('label'));
 
 			// If data is an array there must be filtered values
 			if (is_array($data) && !empty($data)){
@@ -300,36 +302,39 @@
 						$input = Widget::Input(
 							'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . '][' . $col . '][' . $key . ']' . $fieldnamePostfix,
 							(strlen($value) !== 0 || $col != 'value') ? (string)$value : (string)++$max_position["max"],
-							($this->get('hide') == 'yes' || $col != 'value') ? 'hidden' : 'text'
+							($isHidden  || $col != 'value') ? 'hidden' : 'text'
 						);
 						$inputs->appendChild($input);
 					}
 				}
-				// for now hide all 
-				$wrapper->addClass('irrelevant');
-				$wrapper->appendChild($inputs);
-			} else {
+				if ($isHidden) {
+					$wrapper->addClass('irrelevant');
+				}
+				$label->appendChild($inputs);
+			}
+			else {
 				$input = Widget::Input(
 					'fields' . $fieldnamePrefix . '[' . $this->get('element_name') . ']' . $fieldnamePostfix,
 					(strlen($value) !== 0 ? (string)$value : (string)++$max_position["max"]),
 					($this->get('hide') == 'yes') ? 'hidden' : 'text'
 				);
 
-				if($this->get('hide') != 'yes') {
-					$label = Widget::Label($this->get('label'));
-					if($this->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
-					$label->appendChild($input);
-					if($flagWithError != null) {
-						$wrapper->appendChild(Widget::Error($label, $flagWithError));
-					}
-					else {
-						$wrapper->appendChild($label);
+				if (!$isHidden) {
+					if ($this->get('required') != 'yes') {
+						$label->appendChild(new XMLElement('i', __('Optional')));
 					}
 				}
 				else {
 					$wrapper->addClass('irrelevant');
-					$wrapper->appendChild($input);
 				}
+				$label->appendChild($input);
+			}
+
+			if ($flagWithError != null) {
+				$wrapper->appendChild(Widget::Error($label, $flagWithError));
+			}
+			else {
+				$wrapper->appendChild($label);
 			}
 		}
 
