@@ -5,9 +5,9 @@
 	Class contentExtensionOrder_entriesSave extends JSONPage{
 		
 		public function view(){
-			$field_id = General::sanitize($_GET['field']);
-			$items = $_GET['items'];
-			$filters = $_GET['filters'];
+			$field_id = General::sanitize($_POST['field']);
+			$items = $_POST['items'];
+			$filters = $_POST['filters'];
 
 			if(!is_array($items) || empty($items)) {
 				$this->_Result['error'] = __('No items provided');

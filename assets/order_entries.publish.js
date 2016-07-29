@@ -42,7 +42,7 @@
 			if (table.find('.order-entries-item').length > 0){
 				startValue = parseInt(table.find('.order-entries-item').eq(0).text(),10);
 			} else {
-				startValue = parseInt(table.find('tbody tr').eq(0).data('order'),10);				
+				startValue = parseInt(table.find('tbody tr').eq(0).data('order'),10);
 			}
 			var assumedStartValue = Symphony.Context.get('env').pagination['max-rows'] * (Symphony.Context.get('env').pagination['current'] - 1) + 1;
 			if (startValue == 0 || direction == 'asc' && startValue < assumedStartValue) {
@@ -65,13 +65,13 @@
 			// Store sort order
 			if(oldSorting != newSorting) {
 				$.ajax({
-					type: 'GET',
+					type: 'POST',
 					url: Symphony.Context.get('symphony') + '/extension/order_entries/save/',
 					data: newSorting + '&field=' + fieldId + filters + '&' + Symphony.Utilities.getXSRF(true),
 					success: function() {
 						oldSorting = newSorting;
 
-					// Update indexes
+						// Update indexes
 						var items = table.find('tbody tr');
 						items.each(function(index) {
 							if(direction == 'asc') {
