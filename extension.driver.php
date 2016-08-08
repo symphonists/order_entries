@@ -234,7 +234,7 @@
 		/**
 		 * {@inheritDoc}
 		 */
-		public function update($previousVersion) {
+		public function update($previousVersion = false) {
 			$status = array();
 
 			// Prior version 1.6
