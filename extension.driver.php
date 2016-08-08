@@ -51,7 +51,7 @@
 			if (empty($filterableFields)) return array();
 
 			if (isset(Symphony::Engine()->Page)){
-				$context = Symphony::Engine()->Page->getContext();
+				$context = method_exists(Symphony::Engine()->Page, 'getContext') ? Symphony::Engine()->Page->getContext() : array();
 				$filters = $context['filters'];
 				if (!isset($filters)) $filters = array();
 
