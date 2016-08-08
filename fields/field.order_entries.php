@@ -100,7 +100,7 @@
 			return $groups;
 		}
 
-		function displaySettingsPanel(&$wrapper, $errors = null) {
+		function displaySettingsPanel(XMLElement &$wrapper, $errors = null) {
 			parent::displaySettingsPanel($wrapper, $errors);
 
 			$order = $this->get('sortorder');
@@ -283,7 +283,7 @@
 			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
 		}
 
-		function displayPublishPanel(&$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null) {
+		function displayPublishPanel(XMLElement &$wrapper, $data = NULL, $flagWithError = NULL, $fieldnamePrefix = NULL, $fieldnamePostfix = NULL, $entry_id = NULL) {
 			$value = $this->getOrderValue($data);
 
 			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
@@ -338,7 +338,7 @@
 			}
 		}
 
-		public function displayDatasourceFilterPanel(&$wrapper, $data = null, $errors = null, $fieldnamePrefix = null, $fieldnamePostfix = null) {
+		public function displayDatasourceFilterPanel(XMLElement &$wrapper, $data = NULL, $errors = NULL, $fieldnamePrefix = NULL, $fieldnamePostfix = NULL) {
 			parent::displayDatasourceFilterPanel($wrapper, $data, $errors, $fieldnamePrefix, $fieldnamePostfix);
 
 			$text = new XMLElement('p', __('To filter by ranges, add <code>%s</code> to the beginning of the filter input. Use <code>%s</code> for field name. E.G. <code>%s</code>', array('mysql:', 'value', 'mysql: value &gt;= 1.01 AND value &lt;= {$price}')), array('class' => 'help'));
@@ -499,7 +499,7 @@
 			}
 		}
 
-		public function prepareTableValue($data, XMLElement $link = null) {
+		public function prepareTableValue($data, XMLElement $link = NULL, $entry_id = NULL) {
 
 			$orderValue = $this->getOrderValue($data);
 
@@ -516,7 +516,7 @@
 			$wrapper->appendChild(new XMLElement($this->get('element_name'), $this->getOrderValue($data) ));
 		}
 
-		public function getParameterPoolValue(Array $data) {
+		public function getParameterPoolValue(array $data, $entry_id = NULL) {
 			return $this->getOrderValue($data);
 		}
 
