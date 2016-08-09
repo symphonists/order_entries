@@ -240,11 +240,16 @@
 				try {
 					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP INDEX `unique`;");
 				} catch (Exception $ex) {
-					// ignore. This can fail is not index exists.
+					// ignore. This can fail if no index exists.
 					// See #73
 				}
 				if (!empty($fields)) {
-					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD UNIQUE `unique`(`entry_id` {$fields});");
+					try {
+						Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD UNIQUE `unique`(`entry_id` {$fields});");
+					} catch (Exception $ex) {
+					// ignore. This can fail if no index exists.
+					// See #73 (Fix error when deselect a field for filtering and saving the section)
+					}
 				}
 			}
 		}
