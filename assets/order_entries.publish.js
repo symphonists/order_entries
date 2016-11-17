@@ -7,18 +7,26 @@
 	});
 
 	Symphony.Extensions.OrderEntries = function() {
-		var table, fieldId,	direction, oldSorting, newSorting, startValue, filters;
+		var table, fieldId, direction, oldSorting, newSorting, startValue, filters;
 
 		var init = function() {
+			var form = Symphony.Elements.contents.find('form');
 			table = Symphony.Elements.contents.find('table');
 			fieldId = table.attr('data-order-entries-id');
 			direction = table.attr('data-order-entries-direction');
-			filters = Symphony.Context.get('env').filters;
+			filters = form.attr('data-order-entries-filter');
+			var maxRows = parseInt(form.attr('data-order-entries-pagination-max-rows'), 10) || 1;
+			var currentPage = parseInt(form.attr('data-order-entries-pagination-current'), 10) || 1;
 
 			// convert filters into a query string
 			if (filters){
-				filters = {"filters":filters};
-				filters = '&' + $.param(filters)
+				try {
+					filters = '&' + $.param({
+						filters: JSON.parse(filters)
+					});
+				} catch (ex) {
+					filters = '';
+				}
 			} else {
 				filters = '';
 			}
@@ -27,7 +35,7 @@
 			Symphony.Elements.breadcrumbs.append('<p class="inactive"><span>– ' + Symphony.Language.get('drag to reorder') + '</span></p>');
 
 			// Force manual sorting
-			if(table.is('[data-order-entries-force]')) {
+			if (table.is('[data-order-entries-force]')) {
 				table.find('th:not(.field-order_entries)').each(disableSortingModes);
 			}
 
@@ -44,7 +52,7 @@
 			} else {
 				startValue = parseInt(table.find('tbody tr').eq(0).data('order'),10);
 			}
-			var assumedStartValue = Symphony.Context.get('env').pagination['max-rows'] * (Symphony.Context.get('env').pagination['current'] - 1) + 1;
+			var assumedStartValue = maxRows * (currentPage - 1) + 1;
 			if (startValue == 0 || direction == 'asc' && startValue < assumedStartValue) {
 				startValue = assumedStartValue;
 			}

@@ -173,14 +173,6 @@
 		 * Add components for manual entry ordering
 		 */
 		public function addComponents() {
-
-			// get pagination data
-			$pagination = array(
-				'max-rows' => Symphony::Configuration()->get('pagination_maximum_rows', 'symphony'),
-				'current' => (isset($_REQUEST['pg']) && is_numeric($_REQUEST['pg']) ? max(1, intval($_REQUEST['pg'])) : 1)
-			);
-
-
 			// get filter data
 			$filters = $_REQUEST['filter'];
 			if (is_array($filters)){
@@ -190,16 +182,18 @@
 				}
 			}
 
-			// add pagination and filter data into symphony context if Symphony does not provide it
-			Administration::instance()->Page->addElementToHead(
-				new XMLElement(
-					'script', 
-					'if (! Symphony.Context.get(\'env\').pagination) Symphony.Context.get(\'env\').pagination='.json_encode($pagination).';' .
-					'if (! Symphony.Context.get(\'env\').filters) Symphony.Context.get(\'env\').filters='.json_encode($generatedFilters).';'
-					, array(
-						'type' => 'text/javascript'
-					)
-				)
+			// add pagination and filter data on the form element
+			Administration::instance()->Page->Form->setAttribute(
+				'data-order-entries-filter',
+				empty($generatedFilters) ? '' : json_encode($generatedFilters)
+			);
+			Administration::instance()->Page->Form->setAttribute(
+				'data-order-entries-pagination-max-rows',
+				Symphony::Configuration()->get('pagination_maximum_rows', 'symphony')
+			);
+			Administration::instance()->Page->Form->setAttribute(
+				'data-order-entries-pagination-current',
+				(isset($_REQUEST['pg']) && is_numeric($_REQUEST['pg']) ? max(1, intval($_REQUEST['pg'])) : 1)
 			);
 
 			Administration::instance()->Page->addScriptToHead(
