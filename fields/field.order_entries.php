@@ -40,7 +40,7 @@
 		function processRawFieldData($data, &$status, &$message = null, $simulate = false, $entry_id = null) {
 			$status = self::__OK__;
 			$increment_subsequent_order = false;
-			
+
 			if ($entry_id != null) {
 				$entry_id = General::intval($entry_id);
 			}
@@ -48,7 +48,7 @@
 			if (is_array($data)){
 				//TODO Auto Increment for filtered ordering for now just return the data as it is already properly formatted
 				return $data;
-			} 
+			}
 
 			if($entry_id) {
 				$new_value = $data;
@@ -192,7 +192,7 @@
 				$fieldset->appendChild($text);
 
 			}
-			
+
 			$wrapper->appendChild($fieldset);
 
 
@@ -208,7 +208,7 @@
 
 			// fetch existing table schema
 			$currentFilters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$orderFieldId} WHERE Field like 'field_%';");
-			
+
 			//change the value format to match the filtered fields stored
 			foreach ($currentFilters as $key => $value) {
 				$currentFilter = substr($value, 6);
@@ -293,7 +293,6 @@
 
 			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 
-			$inputs = new XMLElement('div');
 			$isHidden = $this->get('hide') == 'yes';
 			$label = Widget::Label($isHidden ? '' : $this->get('label'));
 
@@ -309,13 +308,12 @@
 							(strlen($value) !== 0 || $col != 'value') ? (string)$value : (string)++$max_position["max"],
 							($isHidden  || $col != 'value') ? 'hidden' : 'text'
 						);
-						$inputs->appendChild($input);
+						$label->appendChild($input);
 					}
 				}
 				if ($isHidden) {
 					$wrapper->addClass('irrelevant');
 				}
-				$label->appendChild($inputs);
 			}
 			else {
 				$input = Widget::Input(
@@ -332,7 +330,6 @@
 				else {
 					$wrapper->addClass('irrelevant');
 				}
-				$label->appendChild($input);
 			}
 
 			if ($flagWithError != null) {
@@ -406,7 +403,7 @@
 		}
 
 		public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC') {
-			
+
 			$filterableFields = explode(',', $this->get('filtered_fields'));
 			$section_id = $this->get('parent_section');
 
