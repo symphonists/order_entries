@@ -402,7 +402,7 @@
 			return true;
 		}
 
-		public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC', &$select = NULL) {
+		public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC') {
 
 			$filterableFields = explode(',', $this->get('filtered_fields'));
 			$section_id = $this->get('parent_section');
