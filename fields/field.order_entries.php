@@ -40,7 +40,7 @@
 		function processRawFieldData($data, &$status, &$message = null, $simulate = false, $entry_id = null) {
 			$status = self::__OK__;
 			$increment_subsequent_order = false;
-			
+
 			if ($entry_id != null) {
 				$entry_id = General::intval($entry_id);
 			}
@@ -48,7 +48,7 @@
 			if (is_array($data)){
 				//TODO Auto Increment for filtered ordering for now just return the data as it is already properly formatted
 				return $data;
-			} 
+			}
 
 			if($entry_id) {
 				$new_value = $data;
@@ -192,7 +192,7 @@
 				$fieldset->appendChild($text);
 
 			}
-			
+
 			$wrapper->appendChild($fieldset);
 
 
@@ -208,7 +208,7 @@
 
 			// fetch existing table schema
 			$currentFilters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$orderFieldId} WHERE Field like 'field_%';");
-			
+
 			//change the value format to match the filtered fields stored
 			foreach ($currentFilters as $key => $value) {
 				$currentFilter = substr($value, 6);
@@ -288,12 +288,11 @@
 			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
 		}
 
-		function displayPublishPanel(XMLElement &$wrapper, $data = NULL, $flagWithError = NULL, $fieldnamePrefix = NULL, $fieldnamePostfix = NULL, $entry_id = NULL) {
+		function displayPublishPanel(XMLElement &$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null, $entry_id = null) {
 			$value = $this->getOrderValue($data);
 
 			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
 
-			$inputs = new XMLElement('div');
 			$isHidden = $this->get('hide') == 'yes';
 			$label = Widget::Label($isHidden ? '' : $this->get('label'));
 
@@ -309,13 +308,12 @@
 							(strlen($value) !== 0 || $col != 'value') ? (string)$value : (string)++$max_position["max"],
 							($isHidden  || $col != 'value') ? 'hidden' : 'text'
 						);
-						$inputs->appendChild($input);
+						$label->appendChild($input);
 					}
 				}
 				if ($isHidden) {
 					$wrapper->addClass('irrelevant');
 				}
-				$label->appendChild($inputs);
 			}
 			else {
 				$input = Widget::Input(
@@ -332,7 +330,6 @@
 				else {
 					$wrapper->addClass('irrelevant');
 				}
-				$label->appendChild($input);
 			}
 
 			if ($flagWithError != null) {
@@ -343,7 +340,7 @@
 			}
 		}
 
-		public function displayDatasourceFilterPanel(XMLElement &$wrapper, $data = NULL, $errors = NULL, $fieldnamePrefix = NULL, $fieldnamePostfix = NULL) {
+		public function displayDatasourceFilterPanel(XMLElement &$wrapper, $data = null, $errors = null, $fieldnamePrefix = null, $fieldnamePostfix = null) {
 			parent::displayDatasourceFilterPanel($wrapper, $data, $errors, $fieldnamePrefix, $fieldnamePostfix);
 
 			$text = new XMLElement('p', __('To filter by ranges, add <code>%s</code> to the beginning of the filter input. Use <code>%s</code> for field name. E.G. <code>%s</code>', array('mysql:', 'value', 'mysql: value &gt;= 1.01 AND value &lt;= {$price}')), array('class' => 'help'));
@@ -377,9 +374,9 @@
 		public function createTable() {
 			return Symphony::Database()->query("
 				CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
-					`id` int(11) unsigned NOT null auto_increment,
-					`entry_id` int(11) unsigned NOT null,
-					`value` double default null,
+					`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+					`entry_id` INT(11) UNSIGNED NOT NULL,
+					`value` DOUBLE DEFAULT NULL,
 					PRIMARY KEY  (`id`),
 					UNIQUE KEY `unique` (`entry_id`),
 					KEY `value` (`value`)
@@ -406,7 +403,7 @@
 		}
 
 		public function buildSortingSQL(&$joins, &$where, &$sort, $order = 'ASC') {
-			
+
 			$filterableFields = explode(',', $this->get('filtered_fields'));
 			$section_id = $this->get('parent_section');
 
@@ -504,7 +501,7 @@
 			}
 		}
 
-		public function prepareTableValue($data, XMLElement $link = NULL, $entry_id = NULL) {
+		public function prepareTableValue($data, XMLElement $link = null, $entry_id = null) {
 
 			$orderValue = $this->getOrderValue($data);
 
@@ -521,7 +518,7 @@
 			$wrapper->appendChild(new XMLElement($this->get('element_name'), $this->getOrderValue($data) ));
 		}
 
-		public function getParameterPoolValue(array $data, $entry_id = NULL) {
+		public function getParameterPoolValue(array $data, $entry_id = null) {
 			return $this->getOrderValue($data);
 		}
 
