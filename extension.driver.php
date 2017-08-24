@@ -7,7 +7,7 @@
 		private $field_id = 0;
 		private $direction = 'asc';
 		private $dsFilters;
-		
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -35,7 +35,7 @@
 				)
 			);
 		}
-		
+
 		/**
 		 * Save the Datasource Filter Context so it can be used for ordering
 		 */
@@ -91,7 +91,7 @@
 			$callback = Symphony::Engine()->getPageCallback();
 
 			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
-				
+
 				// Fetch sort settings for this section (sort field ID and direction)
 				$section_id = SectionManager::fetchIDFromHandle($callback['context']['section_handle']);
 
@@ -115,7 +115,7 @@
 				}
 			}
 		}
-		
+
 		/**
 		 * Force manual sorting
 		 */
@@ -127,7 +127,7 @@
 
 			if($callback['driver'] == 'publish' && $callback['context']['page'] == 'index') {
 				$contents = $context['oPage']->Contents->getChildren();
-				
+
 				// check every child, since the
 				// form may not always be the first element
 				foreach ($contents as $child) {
@@ -162,13 +162,13 @@
 									$tr->setAttribute('data-order',$order);
 								}
 						}
-						
+
 						break;
 					}
 				}
 			}
 		}
-		
+
 		/**
 		 * Add components for manual entry ordering
 		 */
@@ -217,14 +217,14 @@
 				Symphony::Configuration()->set('pagination_maximum_rows', $this->pagination_maximum_rows, 'symphony');
 			}
 		}
-			
+
 		/**
 		 * {@inheritDoc}
 		 */
 		public function uninstall() {
 			Symphony::Database()->query("DROP TABLE `tbl_fields_order_entries`");
 		}
-		
+
 		/**
 		 * {@inheritDoc}
 		 */
@@ -235,16 +235,16 @@
 			if(version_compare($previousVersion, '1.6', '<')) {
 				$status[] = Symphony::Database()->query("
 					ALTER TABLE `tbl_fields_order_entries`
-					ADD `force_sort` enum('yes','no')
+					ADD `force_sort` ENUM('yes','no')
 					DEFAULT 'no'
 				");
 			}
-			
+
 			// Prior version 1.8
 			if(version_compare($previousVersion, '1.8', '<')) {
 				$status[] = Symphony::Database()->query("
 					ALTER TABLE `tbl_fields_order_entries`
-					ADD `hide` enum('yes','no')
+					ADD `hide` ENUM('yes','no')
 					DEFAULT 'no'
 				");
 			}
@@ -253,7 +253,7 @@
 			if(version_compare($previousVersion, '2.1.4', '<')) {
 				$status[] = Symphony::Database()->query("
 					ALTER TABLE `tbl_fields_order_entries`
-					ADD `disable_pagination` enum('yes','no')
+					ADD `disable_pagination` ENUM('yes','no')
 					DEFAULT 'yes'
 				");
 			}
@@ -262,7 +262,7 @@
 			if(version_compare($previousVersion, '2.2', '<')) {
 				$status[] = Symphony::Database()->query("
 					ALTER TABLE `tbl_fields_order_entries`
-					ADD `filtered_fields` varchar(255) DEFAULT NULL
+					ADD `filtered_fields` VARCHAR(255) DEFAULT NULL
 				");
 
 				$fields =  Symphony::Database()->fetchCol('field_id',"SELECT field_id FROM `tbl_fields_order_entries`");
@@ -288,23 +288,23 @@
 				return true;
 			}
 		}
-		
+
 		/**
 		 * {@inheritDoc}
 		 */
 		public function install() {
 			return Symphony::Database()->query("
 				CREATE TABLE `tbl_fields_order_entries` (
-					`id` int(11) unsigned NOT NULL auto_increment,
-					`field_id` int(11) unsigned NOT NULL,
-					`force_sort` enum('yes','no') default 'no',
-					`hide` enum('yes','no') default 'no',
-					`disable_pagination` enum('yes','no') default 'no',
-					`filtered_fields` varchar(255) DEFAULT NULL,
+					`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+					`field_id` INT(11) UNSIGNED NOT NULL,
+					`force_sort` ENUM('yes','no') DEFAULT 'no',
+					`hide` ENUM('yes','no') DEFAULT 'no',
+					`disable_pagination` ENUM('yes','no') DEFAULT 'no',
+					`filtered_fields` VARCHAR(255) DEFAULT NULL,
 					PRIMARY KEY  (`id`),
 					UNIQUE KEY `field_id` (`field_id`)
 				) TYPE=MyISAM
 			");
 		}
-			
+
 	}
