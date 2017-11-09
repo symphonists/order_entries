@@ -5,6 +5,9 @@
 	Class contentExtensionOrder_entriesSave extends JSONPage{
 		
 		public function view(){
+			if (!isset($_POST['field'])) {
+				return;
+			}
 			$field_id = General::sanitize($_POST['field']);
 			$items = $_POST['items'];
 			$filters = $_POST['filters'];
