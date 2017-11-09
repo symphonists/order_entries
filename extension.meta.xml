@@ -18,6 +18,9 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.3.8" date="2017-11-09" min="2.5" max="2.x.x">
+			- Prevent error when no fields are set (#85)
+		</release>
 		<release version="2.3.7" date="2016-11-17" min="2.5" max="2.x.x">
 			- Removed inline script injection (#83)
 		</release>
