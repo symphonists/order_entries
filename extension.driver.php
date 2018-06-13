@@ -222,7 +222,11 @@
 		 * {@inheritDoc}
 		 */
 		public function uninstall() {
-			Symphony::Database()->query("DROP TABLE `tbl_fields_order_entries`");
+			return Symphony::Database()
+				->drop('tbl_fields_order_entries')
+				->ifExists()
+				->execute()
+				->success();
 		}
 
 		/**
@@ -233,50 +237,77 @@
 
 			// Prior version 1.6
 			if(version_compare($previousVersion, '1.6', '<')) {
-				$status[] = Symphony::Database()->query("
-					ALTER TABLE `tbl_fields_order_entries`
-					ADD `force_sort` ENUM('yes','no')
-					DEFAULT 'no'
-				");
+				$status[] = Symphony::Database()
+					->alter('tbl_fields_order_entries')
+					->add([
+						'force_sort' => [
+							'type' => 'enum',
+							'values' => ['yes','no'],
+							'default' => 'no',
+						],
+					])
+					->execute()
+					->success();
 			}
 
 			// Prior version 1.8
 			if(version_compare($previousVersion, '1.8', '<')) {
-				$status[] = Symphony::Database()->query("
-					ALTER TABLE `tbl_fields_order_entries`
-					ADD `hide` ENUM('yes','no')
-					DEFAULT 'no'
-				");
+				$status[] = Symphony::Database()
+					->alter('tbl_fields_order_entries')
+					->add([
+						'hide' => [
+							'type' => 'enum',
+							'values' => ['yes','no'],
+							'default' => 'no',
+						],
+					])
+					->execute()
+					->success();
 			}
 
 			// Prior version 2.1.4
 			if(version_compare($previousVersion, '2.1.4', '<')) {
-				$status[] = Symphony::Database()->query("
-					ALTER TABLE `tbl_fields_order_entries`
-					ADD `disable_pagination` ENUM('yes','no')
-					DEFAULT 'yes'
-				");
+				$status[] = Symphony::Database()
+					->alter('tbl_fields_order_entries')
+					->add([
+						'disable_pagination' => [
+							'type' => 'enum',
+							'values' => ['yes','no'],
+							'default' => 'no',
+						],
+					])
+					->execute()
+					->success();
 			}
 
 			// Prior version 2.2
 			if(version_compare($previousVersion, '2.2', '<')) {
-				$status[] = Symphony::Database()->query("
-					ALTER TABLE `tbl_fields_order_entries`
-					ADD `filtered_fields` VARCHAR(255) DEFAULT NULL
-				");
+				$status[] = Symphony::Database()
+					->alter('tbl_fields_order_entries')
+					->add([
+						'filtered_fields' => [
+							'type' => 'varchar(255)',
+							'null' => true,
+						],
+					])
+					->execute()
+					->success();
 
-				$fields =  Symphony::Database()->fetchCol('field_id',"SELECT field_id FROM `tbl_fields_order_entries`");
+				$fields =  Symphony::Database()
+					->select(['field_id'])
+					->from('tbl_fields_order_entries')
+					->execute()
+					->column('field_id');
 
 				foreach ($fields as $key => $field) {
-					$status[] = Symphony::Database()->query("
-						ALTER TABLE `tbl_entries_data_{$field}`
-						DROP INDEX `entry_id`
-					");
-
-					$status[] = Symphony::Database()->query("
-						ALTER TABLE `tbl_entries_data_{$field}`
-						ADD UNIQUE `unique`(`entry_id`)
-					");
+					$status[] = Symphony::Database()
+						->alter('tbl_entries_data_' . $field)
+						->dropIndex('entry_id')
+						->addKey([
+							'entry_id' => 'unique',
+						])
+						->execute()
+						->success();
 				}
 			}
 
@@ -293,18 +324,41 @@
 		 * {@inheritDoc}
 		 */
 		public function install() {
-			return Symphony::Database()->query("
-				CREATE TABLE `tbl_fields_order_entries` (
-					`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-					`field_id` INT(11) UNSIGNED NOT NULL,
-					`force_sort` ENUM('yes','no') DEFAULT 'no',
-					`hide` ENUM('yes','no') DEFAULT 'no',
-					`disable_pagination` ENUM('yes','no') DEFAULT 'no',
-					`filtered_fields` VARCHAR(255) DEFAULT NULL,
-					PRIMARY KEY  (`id`),
-					UNIQUE KEY `field_id` (`field_id`)
-				) TYPE=MyISAM
-			");
+			return Symphony::Database()
+				->create('tbl_fields_order_entries')
+				->ifNotExists()
+				->fields([
+					'id' => [
+						'type' => 'int(11)',
+						'auto' => true,
+					],
+					'field_id' => 'int(11)',
+					'force_sort' => [
+						'type' => 'enum',
+						'values' => ['yes','no'],
+						'default' => 'no',
+					],
+					'hide' => [
+						'type' => 'enum',
+						'values' => ['yes','no'],
+						'default' => 'no',
+					],
+					'disable_pagination' => [
+						'type' => 'enum',
+						'values' => ['yes','no'],
+						'default' => 'no',
+					],
+					'filtered_fields' => [
+						'type' => 'varchar(255)',
+						'null' => true,
+					],
+				])
+				->keys([
+					'id' => 'primary',
+					'field_id' => 'unique',
+				])
+				->execute()
+				->success();
 		}
 
 	}

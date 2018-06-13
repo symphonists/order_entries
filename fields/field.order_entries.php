@@ -52,12 +52,13 @@
 
 			if($entry_id) {
 				$new_value = $data;
-				$current_value = Symphony::Database()->fetchVar("value", 0, "
-					SELECT value
-					FROM tbl_entries_data_{$this->get('id')}
-					WHERE entry_id=".$entry_id."
-					LIMIT 1
-				");
+				$current_value = Symphony::Database()
+					->select(['value'])
+					->from('tbl_entries_data_' . $this->get('id'))
+					->where(['entry_id' => $entry_id])
+					->limit(1)
+					->execute()
+					->variable('value');
 
 				if(isset($current_value) && $current_value !== $new_value) {
 					$increment_subsequent_order = true;
@@ -68,7 +69,14 @@
 			}
 
 			if($increment_subsequent_order && !empty($data)) {
-				Symphony::Database()->query("UPDATE tbl_entries_data_{$this->get('id')} SET value = (value + 1) WHERE value >= ".$data);
+				Symphony::Database()
+					->update('tbl_entries_data_' . $this->get('id'))
+					->set([
+						'value' => '$value + 1',
+					])
+					->where(['value' => ['>=' => $data]])
+					->execute()
+					->success();
 			}
 
 			return array(
@@ -207,7 +215,12 @@
 			$orderFieldId = $this->get('id');
 
 			// fetch existing table schema
-			$currentFilters = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM tbl_entries_data_{$orderFieldId} WHERE Field like 'field_%';");
+			$currentFilters = Symphony::Database()
+				->showColumns()
+				->from('tbl_entries_data_' . $orderFieldId)
+				->where(['Field' => ['like' => 'field_%']])
+				->execute()
+				->column('Field');
 
 			//change the value format to match the filtered fields stored
 			foreach ($currentFilters as $key => $value) {
@@ -223,13 +236,25 @@
 			$removedFilters = array_filter(array_diff($currentFilters, $filteredFields));
 
 			foreach ($removedFilters as $key => $field_id) {
-				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP COLUMN `field_{$field_id}`");
+				Symphony::Database()
+					->alter('tbl_entries_data_' . $orderFieldId)
+					->drop('field_' . $field_id)
+					->execute()
+					->success();
 			}
 
 			foreach ($newFilters as $key => $field_id) {
 				//maybe in the future fields can give supported filters until then using a varchar for flexibility
-				$fieldtype = "varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL";
-				Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD COLUMN `field_{$field_id}`{$fieldtype}");
+				Symphony::Database()
+					->alter('tbl_entries_data_' . $orderFieldId)
+					->add([
+						'field_' . $field_id => [
+							'type' => 'varchar(255)',
+							'null' => true,
+						],
+					])
+					->execute()
+					->success();
 			}
 
 			if (!empty($newFilters) || !empty($removedFilters)){
@@ -238,14 +263,27 @@
 					$fields .= ",`field_{$field_id}` ";
 				}
 				try {
-					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` DROP INDEX `unique`;");
+					Symphony::Database()
+						->alter('tbl_entries_data_' . $orderFieldId)
+						->dropIndex('unique')
+						->execute()
+						->success();
 				} catch (Exception $ex) {
 					// ignore. This can fail if no index exists.
 					// See #73
 				}
 				if (!empty($fields)) {
 					try {
-						Symphony::Database()->query("ALTER TABLE `tbl_entries_data_{$orderFieldId}` ADD UNIQUE `unique`(`entry_id` {$fields});");
+						Symphony::Database()
+							->alter('tbl_entries_data_' . $orderFieldId)
+							->addKey([
+								'unique' => [
+									'type' => 'unique',
+									'cols' => ['entry_id'],
+								],
+							])
+							->execute()
+							->success();
 					} catch (Exception $ex) {
 					// ignore. This can fail if no index exists.
 					// See #73 (Fix error when deselect a field for filtering and saving the section)
@@ -271,10 +309,10 @@
 			$fields = array();
 
 			$fields['field_id'] = $id;
-			$fields['force_sort'] = $this->get('force_sort');
-			$fields['disable_pagination'] = $this->get('disable_pagination');
+			$fields['force_sort'] = $this->get('force_sort') == 'yes' ? 'yes' : 'no';
+			$fields['disable_pagination'] = $this->get('disable_pagination') == 'yes' ? 'yes' : 'no';
+			$fields['hide'] = $this->get('hide') == 'yes' ? 'yes' : 'no';
 			$fields['filtered_fields'] = implode(',', $filteredFields);
-			$fields['hide'] = $this->get('hide');
 
 			// Update section's sorting field
 			if($this->get('force_sort') == 'yes') {
@@ -284,14 +322,28 @@
 
 			$this->updateFilterTable();
 
-			Symphony::Database()->query("DELETE FROM `tbl_fields_".$this->handle()."` WHERE `field_id` = '$id' LIMIT 1");
-			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
+			Symphony::Database()
+				->delete('tbl_fields_' . $this->handle())
+				->where(['field_id' => $id])
+				->limit(1)
+				->execute()
+				->success();
+
+			return Symphony::Database()
+				->insert('tbl_fields_' . $this->handle())
+				->values($fields)
+				->execute()
+				->success();
 		}
 
 		function displayPublishPanel(XMLElement &$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null, $entry_id = null) {
 			$value = $this->getOrderValue($data);
 
-			$max_position = Symphony::Database()->fetchRow(0, "SELECT max(value) AS max FROM tbl_entries_data_{$this->get('id')}");
+			$max_position = Symphony::Database()
+				->select(['max(value)' => 'max'])
+				->from('tbl_entries_data_' . $this->get('id'))
+				->execute()
+				->rows()[0];
 
 			$isHidden = $this->get('hide') == 'yes';
 			$label = Widget::Label($isHidden ? '' : $this->get('label'));
@@ -372,16 +424,30 @@
 		}
 
 		public function createTable() {
-			return Symphony::Database()->query("
-				CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
-					`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-					`entry_id` INT(11) UNSIGNED NOT NULL,
-					`value` DOUBLE DEFAULT NULL,
-					PRIMARY KEY  (`id`),
-					UNIQUE KEY `unique` (`entry_id`),
-					KEY `value` (`value`)
-				) TYPE=MyISAM;
-			");
+			return Symphony::Database()
+				->create('tbl_entries_data_' . $this->get('id'))
+				->ifNotExists()
+				->fields([
+					'id' => [
+						'type' => 'int(11)',
+						'auto' => true,
+					],
+					'entry_id' => 'int(11)',
+					'value' => [
+						'type' => 'double',
+						'null' => true,
+					],
+				])
+				->keys([
+					'id' => 'primary',
+					'unique' => [
+						'type' => 'unique',
+						'cols' => ['entry_id'],
+					],
+					'value' => 'key',
+				])
+				->execute()
+				->success();
 		}
 
 		function buildDSRetrievalSQL($data, &$joins, &$where, $andOperation = false) {
