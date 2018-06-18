@@ -97,8 +97,8 @@
 
 				// Fetch sorting field
 				if($section_id) {
-					$section = SectionManager::fetch($section_id);
-					$field = FieldManager::fetch($section->getSortingField());
+					$section = (new SectionManager)->select()->section($section_id)->execute()->next();
+					$field = (new FieldManager)->select()->field($section->getSortingField())->execute()->next();
 
 					// Check sorting field
 					if($field && $field->get('type') == 'order_entries') {
@@ -143,7 +143,7 @@
 							$table->setAttribute('data-order-entries-force', 'true');
 						}
 
-						$field = FieldManager::fetch($this->field_id);
+						$field = (new FieldManager)->select()->field($this->field_id)->execute()->next();
 
 						if ($field && $field->get('show_column') == 'no'){
 
