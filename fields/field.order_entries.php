@@ -352,7 +352,7 @@
 				->select(['max(value)' => 'max'])
 				->from('tbl_entries_data_' . $this->get('id'))
 				->execute()
-				->rows()[0];
+				->next();
 
 			$isHidden = $this->get('hide') == 'yes';
 			$label = Widget::Label($isHidden ? '' : $this->get('label'));
