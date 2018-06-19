@@ -3,7 +3,7 @@
 	require_once(TOOLKIT . '/class.jsonpage.php');
 
 	Class contentExtensionOrder_entriesSave extends JSONPage{
-		
+
 		public function view(){
 			$field_id = General::sanitize($_POST['field']);
 			$items = $_POST['items'];
@@ -16,7 +16,11 @@
 
 			$where = '';
 
-			$field = FieldManager::fetch($field_id);
+			$field = (new FieldManager)
+				->select()
+				->field($field_id)
+				->execute()
+				->next();
 			$filterableFields = explode(',', $field->get('filtered_fields'));
 			$section_id = $field->get('parent_section');
 
@@ -98,8 +102,8 @@
 			 * @param array $entry_id
 			 */
 			Symphony::ExtensionManager()->notifyMembers('EntriesPostOrder', '/publish/', array('entry_id' => array_keys($items)));
-	
+
 			$this->_Result['success'] = __('Sorting complete');
 		}
-		
+
 	}

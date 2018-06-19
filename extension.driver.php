@@ -97,8 +97,16 @@
 
 				// Fetch sorting field
 				if($section_id) {
-					$section = (new SectionManager)->select()->section($section_id)->execute()->next();
-					$field = (new FieldManager)->select()->field($section->getSortingField())->execute()->next();
+					$section = (new SectionManager)
+						->select()
+						->section($section_id)
+						->execute()
+						->next();
+					$field = (new FieldManager)
+						->select()
+						->field($section->getSortingField())
+						->execute()
+						->next();
 
 					// Check sorting field
 					if($field && $field->get('type') == 'order_entries') {
@@ -143,7 +151,11 @@
 							$table->setAttribute('data-order-entries-force', 'true');
 						}
 
-						$field = (new FieldManager)->select()->field($this->field_id)->execute()->next();
+						$field = (new FieldManager)
+							->select()
+							->field($this->field_id)
+							->execute()
+							->next();
 
 						if ($field && $field->get('show_column') == 'no'){
 
@@ -156,7 +168,11 @@
 								$entry_id = str_replace('id-', '', $tr->getAttribute('id'));
 
 								if ($entry_id){
-									$entry = current(EntryManager::fetch($entry_id));
+									$entry = current((new EntryManager)
+										->select()
+										->entry($entry_id)
+										->execute()
+										->next());
 									$data = $entry->getData($this->field_id);
 									$order = $field->getParameterPoolValue($data);
 									$tr->setAttribute('data-order',$order);

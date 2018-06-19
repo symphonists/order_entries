@@ -164,7 +164,12 @@
 			$div = new XMLElement('h3', __('Filtered Ordering'));
 			$fieldset->appendChild($div);
 
-			$section = SectionManager::fetch($this->get('parent_section'));
+			$section = (new SectionManager)
+				->select()
+				->section($this->get('parent_section'))
+				->execute()
+				->next();
+
 			if (!is_object($section)){
 				// you need to save first
 				$div = new XMLElement('p', __('You have to save this field before you can add filtered ordering'));
@@ -316,7 +321,11 @@
 
 			// Update section's sorting field
 			if($this->get('force_sort') == 'yes') {
-				$section = SectionManager::fetch($this->get('parent_section'));
+				$section = (new SectionManager)
+					->select()
+					->section($this->get('parent_section'))
+					->execute()
+					->next();
 				$section->setSortingField($id);
 			}
 
