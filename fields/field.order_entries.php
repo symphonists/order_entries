@@ -308,8 +308,9 @@
 			}
 
 			$filteredFields = $this->get('filtered_fields');
-			if (!isset($filteredFields))
-				$filteredFields = array();
+			if (is_array($filteredFields)) {
+				$filteredFields = implode(',', $filteredFields);
+			}
 
 			$fields = array();
 
@@ -317,7 +318,7 @@
 			$fields['force_sort'] = $this->get('force_sort') == 'yes' ? 'yes' : 'no';
 			$fields['disable_pagination'] = $this->get('disable_pagination') == 'yes' ? 'yes' : 'no';
 			$fields['hide'] = $this->get('hide') == 'yes' ? 'yes' : 'no';
-			$fields['filtered_fields'] = implode(',', $filteredFields);
+			$fields['filtered_fields'] = $filteredFields;
 
 			// Update section's sorting field
 			if($this->get('force_sort') == 'yes') {
