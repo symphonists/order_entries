@@ -128,7 +128,7 @@
 		};
 	}();
 
-	$(document).on('ready.orderentries', function() {
+	$(function () {
 		Symphony.Extensions.OrderEntries.init();
 	});
 
