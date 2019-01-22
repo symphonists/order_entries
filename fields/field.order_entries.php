@@ -505,7 +505,6 @@
 		}
 
 		public function prepareTableValue($data, XMLElement $link = NULL, $entry_id = NULL) {
-
 			$orderValue = $this->getOrderValue($data);
 
 			if(!$link) {
@@ -513,6 +512,7 @@
 			}
 			else {
 				$link->setValue($orderValue);
+				$link->setAttribute('class', 'order-entries-item');
 				return $link->generate();
 			}
 		}
