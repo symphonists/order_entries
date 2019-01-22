@@ -18,6 +18,9 @@
 		</author>
 	</authors>
 	<releases>
+		<release version="2.3.9" date="2019-01-22" min="2.5" max="2.x.x">
+			- Fix error when the field is the first visible (#86)
+		</release>
 		<release version="2.3.8" date="2017-11-09" min="2.5" max="2.x.x">
 			- Prevent error when no fields are set (#85)
 		</release>
