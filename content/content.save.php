@@ -1,7 +1,5 @@
 <?php
 
-	require_once(TOOLKIT . '/class.jsonpage.php');
-
 	Class contentExtensionOrder_entriesSave extends JSONPage{
 		
 		public function view(){
